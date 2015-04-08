@@ -1,23 +1,13 @@
 
 var dispatch = d3.dispatch("load", "changeData", "selectEntity");
 
-// var groups = [
-//   "Unbanked20",
-//   "Underbanke"
-// ];
-
 d3.csv("../data/nyc-sample-data.csv", function(error, pumas) {
   if (error) throw error;
   var data = d3.map();
   pumas.forEach(function(d) {
-    data.set(parseInt(d.PUMACE10, 10), {"id": parseInt(d.PUMACE10, 10), "name": d.Subboro, "borough": d.Borough, "unbanked": d.Unbanked20})
-    // data.set("name", d.Subboro)
-    // data.set("borough", d.Borough)
-    // data.set(d.Unbanked20, d)
-    // data.set(d.PUMACE10, d);
+    data.set(parseInt(d.PUMACE10, 10), {"id": parseInt(d.PUMACE10, 10), "name": d.Subboro, "borough": d.Borough, "unbanked": parseFloat(d.Unbanked20)})
   });
   dispatch.load(data);
-  // console.log(data)
   dispatch.selectEntity(data.get(3810));
   dispatch.changeData(null)
 });
@@ -27,7 +17,7 @@ dispatch.on("load.menu", function(data) {
   var select = d3.select("body")
     .append("div")
     .append("select")
-      .on("change", function() { console.log(data.get(this.value)); dispatch.selectEntity(data.get(this.value)); });
+      .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
   select.selectAll("option")
       .data(data.values())
     .enter().append("option")
@@ -35,50 +25,74 @@ dispatch.on("load.menu", function(data) {
       .text(function(d) { return d.name; });
 
   dispatch.on("selectEntity.menu", function(puma) {
-    // console.log(d3.select("option[value=3810]"))
     select.property("value", puma.id);
   });
 });
 
 // A bar chart to show total population; uses the "bar" namespace.
-// dispatch.on("load.bar", function(stateById) {
-//   var margin = {top: 20, right: 20, bottom: 30, left: 40},
-//       width = 80 - margin.left - margin.right,
-//       height = 460 - margin.top - margin.bottom;
+dispatch.on("load.bar", function(data) {
+  var margin = {top: 20, right: 20, bottom: 30, left: 40},
+      width = 500 - margin.left - margin.right,
+      height = 460 - margin.top - margin.bottom;
 
-//   var y = d3.scale.linear()
-//       .domain([0, d3.max(stateById.values(), function(d) { console.log(d.Unbanked20); return parseFloat(d.Unbanked20); })])
-//       .rangeRound([height, 0])
-//       .nice();
+  var x = d3.scale.linear()
+      .domain([0, d3.max(data.values(), function(d) { return parseFloat(d.unbanked); })])
+      .rangeRound([height, 0])
+      .nice();
 
-//   var yAxis = d3.svg.axis()
-//       .scale(y)
-//       .orient("left")
-//       .tickFormat(d3.format(".2s"));
+  var y = d3.scale.ordinal()
+    .rangeRoundBands([0, width], .1)
+    .domain(data.values().map(function(d) { return d.name; }));
 
-//   var svg = d3.select("body").append("svg")
-//       .attr("width", width + margin.left + margin.right)
-//       .attr("height", height + margin.top + margin.bottom)
-//     .append("g")
-//       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  var yAxis = d3.svg.axis()
+      .scale(y)
 
-//   svg.append("g")
-//       .attr("class", "y axis")
-//       .call(yAxis);
+  var xAxis = d3.svg.axis()
+      .scale(x)
 
-//   var rect = svg.append("rect")
-//       .attr("x", 4)
-//       .attr("width", width - 4)
-//       .attr("y", height)
-//       .attr("height", 0)
-//       .style("fill", "#aaa");
+  var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-//   dispatch.on("statechange.bar", function(d) {
-//     rect.transition()
-//         .attr("y", y(d.total))
-//         .attr("height", y(0) - y(d.total));
-//   });
-// });
+  svg.append("g")
+      .attr("class", "bar x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "bar y axis")
+      .call(yAxis)
+
+
+  svg.selectAll(".bar")
+      .data(data.values())
+    .enter().append("rect")
+      .attr("class", function(d){ return "bar fips_" + d.id; })
+      .attr("y", function(d) { return y(d.name); })
+      .attr("height", y.rangeBand())
+      .attr("x", 0)
+      .attr("width", function(d) { return height - x(d.unbanked); });
+
+  dispatch.on("selectEntity.bar", function(d) {
+    d3.selectAll(".bar").classed("selected",false)
+    d3.select(".bar.fips_" + d.id).classed("selected",true)
+    // rect.transition()
+    //     .attr("y", y(d.unbanked))
+    //     .attr("height", y(0) - y(d.unbanked));
+  });
+});
+
+dispatch.on("selectEntity.puma", function(d) {
+  d3.selectAll(".puma").classed("selected",false)
+  d3.select(".puma.fips_" + d.id).classed("selected",true)
+  console.log(d.id)
+  // rect.transition()
+  //     .attr("y", y(d.unbanked))
+  //     .attr("height", y(0) - y(d.unbanked));
+});
+
 
 // // A pie chart to show population by age group; uses the "pie" namespace.
 // dispatch.on("load.pie", function(stateById) {

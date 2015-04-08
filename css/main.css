@@ -1,10 +1,39 @@
-.axis text {
-  font: 10px sans-serif;
+/************* BAR CHART STYLES ********************/
+.bar.axis {
+  display: none;
 }
 
-.axis line,
-.axis path {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+.selected{
+	fill: #ff6d22;
 }
+
+/************* STYLES FROM ILLUSTRATOR ********************/
+
+.Graphic_x0020_Style{fill:none;}
+/*.bucket_x002D_1{fill:#ACCBEB;stroke:#FFFFFF;stroke-linecap:square;stroke-linejoin:bevel;}
+.bucket_x002D_2{fill:#20A6DF;stroke:#FFFFFF;stroke-linecap:square;stroke-linejoin:bevel;}
+.bucket_x002D_3{fill:#1369B2;stroke:#FFFFFF;stroke-linecap:square;stroke-linejoin:bevel;}
+.bucket_x002D_4{fill:#20407E;stroke:#FFFFFF;stroke-linecap:square;stroke-linejoin:bevel;}
+.bucket_x002D_5{fill:#002E41;stroke:#CCCCDC;stroke-width:0.26;stroke-linecap:square;stroke-linejoin:bevel;}
+
+*/
+.puma{stroke: #FFFFFF;}
+.highlighted{fill:#F26E28;stroke:#FFFFFF;stroke-miterlimit:10;}
+.st0{fill:#EFEEEE;}
+.st1{fill:#1696D2;stroke:#FFFFFF;stroke-miterlimit:10;}
+.st2{fill:none;stroke:#FFFFFF;stroke-width:3;stroke-linecap:square;stroke-linejoin:bevel;}
+.st3{fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:bevel;}
+.st4{fill:#FFFFFF;}
+.st5{fill:#002E41;stroke:#FFFFFF;stroke-width:0.26;stroke-linecap:square;stroke-linejoin:bevel;}
+.st6{font-family:'HelveticaNeue-Italic';}
+.st7{font-size:12;}
+.st8{fill:#F26E28;}
+.st9{font-family:'HelveticaNeue-Bold';}
+.st10{font-size:36;}
+.st11{fill:none;}
+.st12{font-size:18;}
+.st13{fill:none;stroke:#F26E28;stroke-width:2;stroke-miterlimit:10;}
+.st14{font-family:'HelveticaNeue';}
+.st15{fill:#CCCBCB;}
+.st16{letter-spacing:4;}
+.st17{letter-spacing:2;}
