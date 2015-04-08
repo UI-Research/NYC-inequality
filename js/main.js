@@ -73,7 +73,8 @@ dispatch.on("load.bar", function(data) {
       .attr("y", function(d) { return y(d.name); })
       .attr("height", y.rangeBand())
       .attr("x", 0)
-      .attr("width", function(d) { return height - x(d.unbanked); });
+      .attr("width", function(d) { return height - x(d.unbanked); })
+      .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); });;
 
   dispatch.on("selectEntity.bar", function(d) {
     d3.selectAll(".bar").classed("selected",false)
@@ -87,12 +88,31 @@ dispatch.on("load.bar", function(data) {
 dispatch.on("selectEntity.puma", function(d) {
   d3.selectAll(".puma").classed("selected",false)
   d3.select(".puma.fips_" + d.id).classed("selected",true)
-  console.log(d.id)
   // rect.transition()
   //     .attr("y", y(d.unbanked))
   //     .attr("height", y(0) - y(d.unbanked));
 });
 
+
+dispatch.on("load.map", function(data) {
+  data.values().forEach(function(d){
+    // console.log(d)
+    var test = d3.select(".puma.fips_" + d.id)
+    .datum(d)
+    .on("mouseover",function(d){ dispatch.selectEntity(data.get(d.id)) })
+    // console.log(d.stateById, d3.select(".puma.fips_" + d.id))
+  })
+  // d3.selectAll(".puma")
+  //   .data(data.values(), function(d,i){
+  //     var svg_fips, data_fips;
+  //     if (typeof(this.length) == "undefined"){
+  //       svg_fips = d3.select(this).attr("class").replace("puma","").replace(" ","").replace("fips_","")
+  //     }
+  //     console.log(d, svg_fips)
+  //   })
+
+    // .on("mouseover", function(d) {})
+});
 
 // // A pie chart to show population by age group; uses the "pie" namespace.
 // dispatch.on("load.pie", function(stateById) {
