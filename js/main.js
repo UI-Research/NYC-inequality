@@ -51,9 +51,25 @@ function drawGraphic(container_width) {
     if (error) throw error;
     var data = d3.map();
     pumas.forEach(function(d) {
-      if(parseInt(d.FIPS, 10) > 10){
-        data.set(parseInt(d.FIPS, 10), {"id": parseInt(d.FIPS, 10), "name": d["Sub-Boro-Name"], "borough": d.Borough, "unbanked2011": parseFloat(d["Unbanked-2011"]), "underbanked2011": parseFloat(d["Underbanked-2011"]), "unbanked2013": parseFloat(d["Unbanked-2013"]), "underbanked2013": parseFloat(d["Underbanked-2013"])})
-      }
+      var isPuma = (parseInt(d.FIPS, 10) > 10) ? true: false;
+      data.set(parseInt(d.FIPS, 10), {
+        "isPuma": isPuma,
+        "id": parseInt(d.FIPS, 10),
+        "name": d["Sub-Boro-Name"],
+        "borough": d.Borough,
+        "unbanked2011": parseFloat(d["Unbanked-2011"]),
+        "underbanked2011": parseFloat(d["Underbanked-2011"]),
+        "unbanked2013": parseFloat(d["Unbanked-2013"]),
+        "underbanked2013": parseFloat(d["Underbanked-2013"]),
+        "poverty2011": parseFloat(d["poor-2011"]),
+        "poverty2013": parseFloat(d["2013-poverty"]),
+        "income2011": parseFloat(d["Median-Income-2011"]),
+        "income2013": parseFloat(d["median-income-2013 "]),
+        "unemployment2011": parseFloat(d["unemployment-2011"]),
+        "unemployment2013": parseFloat(d["unemployment-2013"]),
+        "foreignBorn2011": parseFloat(d["foreign-born-2011"]),
+        "foreignBorn2013": parseFloat(d["foreign-born-2013"])
+      });
     });
     dispatch.load(data);
   });
@@ -70,7 +86,13 @@ function drawGraphic(container_width) {
       .append("select")
         .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
     select.selectAll("option")
-        .data(data.values())
+        .data(data.values().filter(function(d){ return d.isPuma}).sort(
+          function(a, b) {
+            var textA = a.name.toUpperCase();
+            var textB = b.name.toUpperCase();
+            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+          })
+        )
       .enter().append("option")
         .attr("value", function(d) { return d.id; })
         .text(function(d) { return d.name; });
@@ -119,7 +141,7 @@ function drawGraphic(container_width) {
         width = container_width*.3 - margin.left - margin.right,
         height = Math.ceil((width * barAspectHeight) / barAspectWidth) - margin.top - margin.bottom;
 
-    var values = data.values().sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).reverse()
+    var values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).reverse()
     var x = d3.scale.linear()
         .domain([0, d3.max(values, function(d) {
            return d3.max([parseFloat(d.unbanked2013), parseFloat(d.unbanked2011), parseFloat(d.underbanked2011), parseFloat(d.underbanked2013)]); 
@@ -172,7 +194,7 @@ function drawGraphic(container_width) {
 
     dispatch.on("changeContext.bar", function(type, year) {
       var context = getContext(type, year);
-      values = data.values().sort(function(a,b){ return a[context] - b[context]}).reverse()
+      values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a[context] - b[context]}).reverse()
 
       y = d3.scale.ordinal()
       .rangeRoundBands([0, height], .1)
@@ -188,7 +210,6 @@ function drawGraphic(container_width) {
     });
 
     dispatch.on("sortBars.bar", function(type,year){
-
       svg.selectAll("rect.bar")
       .sort(function(a,b){return a[getContext(type,year)] - b[getContext(type,year)]})
         .transition()
@@ -196,7 +217,7 @@ function drawGraphic(container_width) {
           return i * 5;
         })
         .duration(500)
-        .attr("y",function(d) {console.log(d.name);   return y(d.name); })
+        .attr("y",function(d) {return y(d.name); })
     });
   });
 
@@ -207,7 +228,7 @@ function drawGraphic(container_width) {
 
 
   dispatch.on("load.map", function(data) {
-    var values = data.values().sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).reverse()
+    var values = data.values().sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).filter(function(d){ return d.isPuma}).reverse()
     values.forEach(function(d){
     d3.select(".puma.fips_" + d.id)
       .datum(d)
@@ -217,7 +238,7 @@ function drawGraphic(container_width) {
 
     dispatch.on("changeContext.map", function(type,year){
       var context = getContext(type, year);
-      var sorted = data.values().sort(function(a,b){ return a[context] - b[context]}).reverse()
+      var sorted = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a[context] - b[context]}).reverse()
       sorted.forEach(function(d){
       d3.select(".puma.fips_" + d.id)
         .datum(d)
