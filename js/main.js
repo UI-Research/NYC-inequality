@@ -1,162 +1,233 @@
+var BREAKS = [0,0.1,0.2,0.3,0.4,0.5]
+var COLORS =["#adcdec","#00a9e9","#1268b3","#013b82","#002e42"]
 
-var dispatch = d3.dispatch("load", "changeData", "selectEntity");
+function drawGraphic(container_width) {
+  var getContext = function(type, year){
+    var typeName = d3.select(type)
+                    .attr('class')
+                    .replace('button','')
+                    .replace('selected','')
+                    .replace('type','')
+                    .replace(' ','');
+    var yearName = d3.select(year)
+                    .attr('class')
+                    .replace('button','')
+                    .replace('selected','')
+                    .replace('year','')
+                    .replace('y','')
+                    .replace(' ','');
+    return (typeName.trim() + yearName.trim());
+  }
 
-d3.csv("../data/nyc-sample-data.csv", function(error, pumas) {
-  if (error) throw error;
-  var data = d3.map();
-  pumas.forEach(function(d) {
-    data.set(parseInt(d.PUMACE10, 10), {"id": parseInt(d.PUMACE10, 10), "name": d.Subboro, "borough": d.Borough, "unbanked": parseFloat(d.Unbanked20)})
+  var getColor = function(obj, context){
+    return COLORS[getBuckets(BREAKS, obj[context])[1]-1]
+  }
+  var getBuckets = function(array, value) {
+  var indexes = [],
+      len = array.length,
+      i,
+      index = array.indexOf(value);
+
+  if (~index) {
+    return index;
+  }
+
+  if (value < array[0]) {
+    return -1;  
+  }
+
+  for (i = 1; i < len; i++) {
+    if (array[i] >= value) {
+      return [i - 1, i];
+    }    
+  }
+
+  return -1;
+}
+
+  var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "sortBars");
+
+  d3.csv("../data/data.csv", function(error, pumas) {
+    if (error) throw error;
+    var data = d3.map();
+    pumas.forEach(function(d) {
+      if(parseInt(d.FIPS, 10) > 10){
+        data.set(parseInt(d.FIPS, 10), {"id": parseInt(d.FIPS, 10), "name": d["Sub-Boro-Name"], "borough": d.Borough, "unbanked2011": parseFloat(d["Unbanked-2011"]), "underbanked2011": parseFloat(d["Underbanked-2011"]), "unbanked2013": parseFloat(d["Unbanked-2013"]), "underbanked2013": parseFloat(d["Underbanked-2013"])})
+      }
+    });
+    dispatch.load(data);
   });
-  dispatch.load(data);
-  dispatch.selectEntity(data.get(3810));
-  dispatch.changeData(null)
-});
 
-// A drop-down menu for selecting a state; uses the "menu" namespace.
-dispatch.on("load.menu", function(data) {
-  var select = d3.select("body")
-    .append("div")
-    .append("select")
-      .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
-  select.selectAll("option")
-      .data(data.values())
-    .enter().append("option")
-      .attr("value", function(d) { return d.id; })
-      .text(function(d) { return d.name; });
 
-  dispatch.on("selectEntity.menu", function(puma) {
-    select.property("value", puma.id);
+  dispatch.on("load", function(data) {
+    $(".header.row").empty();
+    $(".barContainer").empty();
   });
-});
 
-// A bar chart to show total population; uses the "bar" namespace.
-dispatch.on("load.bar", function(data) {
-  var margin = {top: 20, right: 20, bottom: 30, left: 40},
-      width = 500 - margin.left - margin.right,
-      height = 460 - margin.top - margin.bottom;
+  dispatch.on("load.menu", function(data) {
+    var select = d3.select(".header.row")
+      .append("div")
+      .append("select")
+        .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
+    select.selectAll("option")
+        .data(data.values())
+      .enter().append("option")
+        .attr("value", function(d) { return d.id; })
+        .text(function(d) { return d.name; });
 
-  var x = d3.scale.linear()
-      .domain([0, d3.max(data.values(), function(d) { return parseFloat(d.unbanked); })])
-      .rangeRound([height, 0])
-      .nice();
-
-  var y = d3.scale.ordinal()
-    .rangeRoundBands([0, width], .1)
-    .domain(data.values().map(function(d) { return d.name; }));
-
-  var yAxis = d3.svg.axis()
-      .scale(y)
-
-  var xAxis = d3.svg.axis()
-      .scale(x)
-
-  var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  svg.append("g")
-      .attr("class", "bar x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-  svg.append("g")
-      .attr("class", "bar y axis")
-      .call(yAxis)
-
-
-  svg.selectAll(".bar")
-      .data(data.values())
-    .enter().append("rect")
-      .attr("class", function(d){ return "bar fips_" + d.id; })
-      .attr("y", function(d) { return y(d.name); })
-      .attr("height", y.rangeBand())
-      .attr("x", 0)
-      .attr("width", function(d) { return height - x(d.unbanked); })
-      .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); });;
-
-  dispatch.on("selectEntity.bar", function(d) {
-    d3.selectAll(".bar").classed("selected",false)
-    d3.select(".bar.fips_" + d.id).classed("selected",true)
-    // rect.transition()
-    //     .attr("y", y(d.unbanked))
-    //     .attr("height", y(0) - y(d.unbanked));
+    dispatch.on("selectEntity.menu", function(puma) {
+      select.property("value", puma.id);
+    });
   });
-});
 
-dispatch.on("selectEntity.puma", function(d) {
-  d3.selectAll(".puma").classed("selected",false)
-  d3.select(".puma.fips_" + d.id).classed("selected",true)
-  // rect.transition()
-  //     .attr("y", y(d.unbanked))
-  //     .attr("height", y(0) - y(d.unbanked));
-});
+  dispatch.on("load.buttons", function(data){
+    var row = d3.select(".header.row")
+    row.append("button")
+      .attr("class", "unbanked button type selected")
+      .text("Unbanked")
+      .on("click", function(){ dispatch.changeContext(this, d3.select(".button.year.selected").node())});
+    row.append("button")
+      .attr("class", "underbanked button type")
+      .text("Underbanked")
+      .on("click", function(){ dispatch.changeContext(this, d3.select(".button.year.selected").node())});
+    row.append("button")
+      .attr("class", "y2011 button year")
+      .text("2011")
+      .on("click", function(){ dispatch.changeContext(d3.select(".button.type.selected").node(), this)});
+    row.append("button")
+      .attr("class", "y2013 button year selected")
+      .text("2013")
+      .on("click", function(){ dispatch.changeContext(d3.select(".button.type.selected").node(), this)});
 
-
-dispatch.on("load.map", function(data) {
-  data.values().forEach(function(d){
-    // console.log(d)
-    var test = d3.select(".puma.fips_" + d.id)
-    .datum(d)
-    .on("mouseover",function(d){ dispatch.selectEntity(data.get(d.id)) })
-    // console.log(d.stateById, d3.select(".puma.fips_" + d.id))
+    row.append("button")
+      .attr("class", "sort button")
+      .text("Sort bars")
+      .on("click", function(){ dispatch.sortBars(d3.select(".button.type.selected").node(), d3.select(".button.year.selected").node())});
   })
-  // d3.selectAll(".puma")
-  //   .data(data.values(), function(d,i){
-  //     var svg_fips, data_fips;
-  //     if (typeof(this.length) == "undefined"){
-  //       svg_fips = d3.select(this).attr("class").replace("puma","").replace(" ","").replace("fips_","")
-  //     }
-  //     console.log(d, svg_fips)
-  //   })
 
-    // .on("mouseover", function(d) {})
-});
+  dispatch.on("changeContext", function(type, year){
+    d3.selectAll(".button.selected").classed("selected",false)
+    d3.select(type).classed("selected", true)
+    d3.select(year).classed("selected", true)
+  })
 
-// // A pie chart to show population by age group; uses the "pie" namespace.
-// dispatch.on("load.pie", function(stateById) {
-//   var width = 880,
-//       height = 460,
-//       radius = Math.min(width, height) / 2;
+  // A bar chart to show total population; uses the "bar" namespace.
+  dispatch.on("load.bar", function(data) {
+    var barAspectHeight = 15; 
+    var barAspectWidth = 7;
+    var margin = {top: 0, right: 20, bottom: 15, left: 18},
+        width = container_width*.3 - margin.left - margin.right,
+        height = Math.ceil((width * barAspectHeight) / barAspectWidth) - margin.top - margin.bottom;
 
-//   var color = d3.scale.ordinal()
-//       .domain(groups)
-//       .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    var values = data.values().sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).reverse()
+    var x = d3.scale.linear()
+        .domain([0, d3.max(values, function(d) {
+           return d3.max([parseFloat(d.unbanked2013), parseFloat(d.unbanked2011), parseFloat(d.underbanked2011), parseFloat(d.underbanked2013)]); 
+         })])
+        .rangeRound([width, 0])
+        .nice();
 
-//   var arc = d3.svg.arc()
-//       .outerRadius(radius - 10)
-//       .innerRadius(radius - 70);
+    var y = d3.scale.ordinal()
+      .rangeRoundBands([0, height], .1)
+      .domain(values.map(function(d) { return d.name; }));
 
-//   var pie = d3.layout.pie()
-//       .sort(null);
+    var yAxis = d3.svg.axis()
+        .scale(y)
 
-//   var svg = d3.select("body").append("svg")
-//       .attr("width", width)
-//       .attr("height", height)
-//     .append("g")
-//       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    var xAxis = d3.svg.axis()
+        .scale(x)
 
-//   var path = svg.selectAll("path")
-//       .data(groups)
-//     .enter().append("path")
-//       .style("fill", color)
-//       .each(function() { this._current = {startAngle: 0, endAngle: 0}; });
+    var svg = d3.select(".barContainer").append("svg")
+        .attr("class", "bars")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-//   dispatch.on("statechange.pie", function(d) {
-//     path.data(pie.value(function(g) { return d[g]; })(groups)).transition()
-//         .attrTween("d", function(d) {
-//           var interpolate = d3.interpolate(this._current, d);
-//           this._current = interpolate(0);
-//           return function(t) {
-//             return arc(interpolate(t));
-//           };
-//         });
-//   });
-// });
+    svg.append("g")
+        .attr("class", "bar x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
 
-// // Coerce population counts to numbers and compute total per state.
-// function type(d) {
-//   d.total = d3.sum(groups, function(k) { return d[k] = +d[k]; });
-//   return d;
-// }
+    svg.append("g")
+        .attr("class", "bar y axis")
+        .call(yAxis)
+
+    svg.selectAll("rect.bar")
+        .data(values)
+      .enter().append("rect")
+        .attr("class", function(d){
+          return "bar fips_" + d.id + ' bucket_' + getBuckets(BREAKS,d.unbanked2013)[1];
+        })
+        .attr("y", function(d) { return y(d.name); })
+        .attr("height", y.rangeBand())
+        .attr("x", 0)
+        .attr("width", function(d) { return width - x(d.unbanked2013); })
+        .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); });;
+
+    dispatch.on("selectEntity.bar", function(d) {
+      d3.selectAll(".bar").classed("selected",false)
+      d3.select(".bar.fips_" + d.id).classed("selected",true)
+    });
+
+    dispatch.on("changeContext.bar", function(type, year) {
+      var context = getContext(type, year);
+      values = data.values().sort(function(a,b){ return a[context] - b[context]}).reverse()
+
+      y = d3.scale.ordinal()
+      .rangeRoundBands([0, height], .1)
+      .domain(values.map(function(d) { return d.name; }));
+
+      d3.selectAll("rect.bar")
+      .transition()
+      .duration(600)
+      .style("fill",function(d){
+        return getColor(d,context)
+      })
+      .attr("width",function(d){ return width - x(d[context])})
+    });
+
+    dispatch.on("sortBars.bar", function(type,year){
+
+      svg.selectAll("rect.bar")
+      .sort(function(a,b){return a[getContext(type,year)] - b[getContext(type,year)]})
+        .transition()
+        .delay(function (d, i) {
+          return i * 5;
+        })
+        .duration(500)
+        .attr("y",function(d) {console.log(d.name);   return y(d.name); })
+    });
+  });
+
+  dispatch.on("selectEntity.puma", function(d) {
+    d3.selectAll(".puma").classed("selected",false)
+    d3.select(".puma.fips_" + d.id).classed("selected",true)
+  });
+
+
+  dispatch.on("load.map", function(data) {
+    var values = data.values().sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).reverse()
+    values.forEach(function(d){
+    d3.select(".puma.fips_" + d.id)
+      .datum(d)
+      .style("fill", getColor(d, "unbanked2013"))
+      .on("mouseover",function(d){ dispatch.selectEntity(data.get(d.id)) })
+    })
+
+    dispatch.on("changeContext.map", function(type,year){
+      var context = getContext(type, year);
+      var sorted = data.values().sort(function(a,b){ return a[context] - b[context]}).reverse()
+      sorted.forEach(function(d){
+      d3.select(".puma.fips_" + d.id)
+        .datum(d)
+        .transition()
+        .duration(600)
+        .style("fill", getColor(d, context))
+      })  
+    })
+  });
+
+}
+
+pymChild = new pym.Child({ renderCallback: drawGraphic });

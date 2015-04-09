@@ -4,9 +4,25 @@
 }
 
 .selected{
-	fill: #ff6d22;
+	fill: #ff6d22 !important;
+	background: #ff6d22;
 }
 
+.bucket_1{fill:#adcdec;}
+.bucket_2{fill:#00a9e9;}
+.bucket_3{fill:#1268b3;}
+.bucket_4{fill:#013b82;}
+.bucket_5{fill:#002e42;}
+
+/************* MAP STYLES ********************/
+svg.map{
+	width: 70%;
+}
+
+.barContainer{
+	width:30%;
+	float: right;
+}
 /************* STYLES FROM ILLUSTRATOR ********************/
 
 .Graphic_x0020_Style{fill:none;}
@@ -19,12 +35,14 @@
 */
 .puma{stroke: #FFFFFF;}
 .highlighted{fill:#F26E28;stroke:#FFFFFF;stroke-miterlimit:10;}
+
 .st0{fill:#EFEEEE;}
 .st1{fill:#1696D2;stroke:#FFFFFF;stroke-miterlimit:10;}
 .st2{fill:none;stroke:#FFFFFF;stroke-width:3;stroke-linecap:square;stroke-linejoin:bevel;}
 .st3{fill:none;stroke:#000000;stroke-linecap:square;stroke-linejoin:bevel;}
 .st4{fill:#FFFFFF;}
 .st5{fill:#002E41;stroke:#FFFFFF;stroke-width:0.26;stroke-linecap:square;stroke-linejoin:bevel;}
+
 .st6{font-family:'HelveticaNeue-Italic';}
 .st7{font-size:12;}
 .st8{fill:#F26E28;}
