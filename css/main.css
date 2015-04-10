@@ -8,12 +8,29 @@
 	background: #ff6d22;
 }
 
+.nycDashedLine{
+	stroke: #aaaaaa;
+}
+
+.nycArrow{
+	fill: #333333;
+}
+.nycText{
+	font: 10pt HelveticaNeue;
+}
 .bucket_1{fill:#adcdec;}
 .bucket_2{fill:#00a9e9;}
 .bucket_3{fill:#1268b3;}
 .bucket_4{fill:#013b82;}
 .bucket_5{fill:#002e42;}
 
+
+.bar.tooltip .value{
+	font: 14pt HelveticaNeue-Bold;
+}
+.bar.tooltip .name{
+	font: 12pt HelveticaNeue-Bold;
+}
 
 /************* SCATTER PLOT STYLES ********************/
 .plot.background{

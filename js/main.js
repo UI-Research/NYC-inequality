@@ -4,6 +4,19 @@ var SCATTER_MAX_PERCENT = 0.5;
 var SCATTER_MAX_DOLLARS = 150000;
 var SCATTER_TICKS = 5;
 var DOT_RADIUS = 8;
+var layout = {"desktop": {
+                "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
+                  "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
+                  "plotTitle": {"x": 8, "y": 25}
+                },
+                "bottomRow": { "left": 41.0, "bottom": 33.0, "right": 24.0, "top": 0.0, "internal":{"large": 26.0, "small":21.0},
+                  "plot": {"left": 43.0, "bottom": 26.0, "right": 13.0, "top": 48.0},
+                  "plotTitle": {"x": 8, "y": 25}
+                },
+              },
+              "tablet": {},
+              "mobile": {}
+        };
 
 function drawGraphic(containerWidth) {
   var getContext = function(type, year){
@@ -179,6 +192,26 @@ function drawGraphic(containerWidth) {
     svg.append("g")
         .attr("class", "bar y axis")
         .call(yAxis)
+    var nycData = data.get(1)
+    console.log(nycData)
+    svg.append("line")
+      .attr("class", "nycDashedLine")
+      .style("stroke-dasharray", ("1, 3"))
+      .attr("x1", width - x(nycData.unbanked2013))
+      .attr("x2", width - x(nycData.unbanked2013))
+      .attr("y1", 0)
+      .attr("y2", height)
+
+    svg.append("polygon")
+      .attr("class", "nycArrow")
+      .attr("points", (width - x(nycData.unbanked2013)) + "," + height*.9 + " " + (width - x(nycData.unbanked2013) + 12) + "," + (height*.9-4) + " " + (width - x(nycData.unbanked2013) + 12) + "," + (height*.9+4))
+
+    svg.append("text")
+      .attr("class","nycText")
+      .attr("y", height*.91)
+      .attr("x", (width - x(nycData.unbanked2013) + 15))
+      .text("NYC")
+
 
     svg.selectAll("rect.bar")
         .data(values)
@@ -186,15 +219,36 @@ function drawGraphic(containerWidth) {
         .attr("class", function(d){
           return "bar fips_" + d.id + ' bucket_' + getBuckets(BREAKS,d.unbanked2013)[1];
         })
+        .attr("value", "unbanked2013")
         .attr("y", function(d) { return y(d.name); })
         .attr("height", y.rangeBand())
         .attr("x", 0)
         .attr("width", function(d) { return width - x(d.unbanked2013); })
         .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); });
 
+    var tooltip = svg.append("g")
+      .attr("class", "bar tooltip")
+
+    tooltip.append("text")
+      .attr("class", "value")
+
+    tooltip.append("text")
+      .attr("class", "name")
+      .attr("y", 20)
+
     dispatch.on("selectEntity.bar", function(d) {
       d3.selectAll(".bar").classed("selected",false)
-      d3.select(".bar.fips_" + d.id).classed("selected",true)
+      var selected = d3.select(".bar.fips_" + d.id).classed("selected",true)
+      var context = selected.attr("value")
+      var formatter = d3.format(".1%")
+      tooltip
+        .attr("transform", "translate(" + (width - x(d[context]) + 7) + "," + (y(d.name)+12) +")")
+
+      tooltip.select(".value")
+        .text(formatter(d[context]))
+      tooltip.select(".name")
+        .text(d.name)
+
     });
 
     dispatch.on("changeContext.bar", function(type, year) {
@@ -202,16 +256,32 @@ function drawGraphic(containerWidth) {
       values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a[context] - b[context]}).reverse()
 
       y = d3.scale.ordinal()
-      .rangeRoundBands([0, height], .1)
-      .domain(values.map(function(d) { return d.name; }));
+        .rangeRoundBands([0, height], .1)
+        .domain(values.map(function(d) { return d.name; }));
+
+      d3.select(".nycDashedLine")
+        .transition()
+        .duration(400)
+        .attr("x1", width - x(nycData[context]))
+        .attr("x2", width - x(nycData[context]))
+      d3.select(".nycArrow")
+        .transition()
+        .duration(800)
+        .attr("points", (width - x(nycData[context])) + "," + height*.9 + " " + (width - x(nycData[context]) + 12) + "," + (height*.9-4) + " " + (width - x(nycData[context]) + 12) + "," + (height*.9+4))
+      d3.select(".nycText")
+        .transition()
+        .duration(800)
+        .attr("x", (width - x(nycData[context]) + 15))
+
 
       d3.selectAll("rect.bar")
-      .transition()
-      .duration(600)
-      .style("fill",function(d){
-        return getColor(d,context)
-      })
-      .attr("width",function(d){ return width - x(d[context])})
+        .attr("value", context)
+        .transition()
+        .duration(600)
+        .style("fill",function(d){
+          return getColor(d,context)
+        })
+        .attr("width",function(d){ return width - x(d[context])})
     });
 
     dispatch.on("sortBars.bar", function(type,year){
@@ -254,19 +324,6 @@ function drawGraphic(containerWidth) {
   });
 
   dispatch.on("load.scatter", function(data){
-    var layout = {"desktop": {
-                "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
-                  "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
-                  "plotTitle": {"x": 8, "y": 25}
-                },
-                "bottomRow": { "left": 41.0, "bottom": 33.0, "right": 24.0, "top": 0.0, "internal":{"large": 26.0, "small":21.0},
-                  "plot": {"left": 43.0, "bottom": 26.0, "right": 13.0, "top": 48.0},
-                  "plotTitle": {"x": 8, "y": 25}
-                },
-              },
-              "tablet": {},
-              "mobile": {}
-            };
     var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
     var bottomRowWidth = (containerWidth - layout.desktop.bottomRow.left - layout.desktop.bottomRow.right - layout.desktop.bottomRow.internal.large - layout.desktop.bottomRow.internal.small*3.0) * 0.25;
 
