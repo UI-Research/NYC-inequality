@@ -14,6 +14,55 @@
 .bucket_4{fill:#013b82;}
 .bucket_5{fill:#002e42;}
 
+
+/************* SCATTER PLOT STYLES ********************/
+.plot.background{
+	fill: #f2f2f2;
+}
+
+.scatter.title{
+	font: 18pt HelveticaNeue-Bold;
+}
+
+.scatter.axis text{
+	font: 12pt HelveticaNeue;
+}
+
+.scatter.axis.y path{
+	display: none;
+}
+
+.scatter.axis.x line, .scatter.axis.x path {
+    shape-rendering: crispEdges;
+    stroke: black;
+    fill: none;
+}
+
+.scatter.axis.x .tick line{
+	stroke: #f2f2f2;
+}
+
+.gridLine{
+	stroke: #e8e8e8;
+}
+
+.scatter.dot{
+	fill: white;
+	stroke-width: 1.5pt;
+}
+.scatter.nyc{
+	stroke: #1771b7;
+}
+.scatter.borough{
+	stroke: #999999;
+}
+.scatter.puma{
+	stroke: #ff6d22;
+}
+
+.scatter.connector{
+	stroke-width: 4pt;
+}
 /************* MAP STYLES ********************/
 svg.map{
 	width: 70%;

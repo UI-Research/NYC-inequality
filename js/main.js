@@ -1,7 +1,11 @@
-var BREAKS = [0,0.1,0.2,0.3,0.4,0.5]
-var COLORS =["#adcdec","#00a9e9","#1268b3","#013b82","#002e42"]
+var BREAKS = [0,0.1,0.2,0.3,0.4,0.5];
+var COLORS =["#adcdec","#00a9e9","#1268b3","#013b82","#002e42"];
+var SCATTER_MAX_PERCENT = 0.5;
+var SCATTER_MAX_DOLLARS = 150000;
+var SCATTER_TICKS = 5;
+var DOT_RADIUS = 8;
 
-function drawGraphic(container_width) {
+function drawGraphic(containerWidth) {
   var getContext = function(type, year){
     var typeName = d3.select(type)
                     .attr('class')
@@ -77,6 +81,7 @@ function drawGraphic(container_width) {
 
   dispatch.on("load", function(data) {
     $(".header.row").empty();
+    $(".scatter.row").empty();
     $(".barContainer").empty();
   });
 
@@ -138,7 +143,7 @@ function drawGraphic(container_width) {
     var barAspectHeight = 15; 
     var barAspectWidth = 7;
     var margin = {top: 0, right: 20, bottom: 15, left: 18},
-        width = container_width*.3 - margin.left - margin.right,
+        width = containerWidth*.3 - margin.left - margin.right,
         height = Math.ceil((width * barAspectHeight) / barAspectWidth) - margin.top - margin.bottom;
 
     var values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).reverse()
@@ -185,7 +190,7 @@ function drawGraphic(container_width) {
         .attr("height", y.rangeBand())
         .attr("x", 0)
         .attr("width", function(d) { return width - x(d.unbanked2013); })
-        .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); });;
+        .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); });
 
     dispatch.on("selectEntity.bar", function(d) {
       d3.selectAll(".bar").classed("selected",false)
@@ -226,7 +231,6 @@ function drawGraphic(container_width) {
     d3.select(".puma.fips_" + d.id).classed("selected",true)
   });
 
-
   dispatch.on("load.map", function(data) {
     var values = data.values().sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).filter(function(d){ return d.isPuma}).reverse()
     values.forEach(function(d){
@@ -234,7 +238,7 @@ function drawGraphic(container_width) {
       .datum(d)
       .style("fill", getColor(d, "unbanked2013"))
       .on("mouseover",function(d){ dispatch.selectEntity(data.get(d.id)) })
-    })
+    });
 
     dispatch.on("changeContext.map", function(type,year){
       var context = getContext(type, year);
@@ -245,8 +249,256 @@ function drawGraphic(container_width) {
         .transition()
         .duration(600)
         .style("fill", getColor(d, context))
-      })  
+      });  
+    });
+  });
+
+  dispatch.on("load.scatter", function(data){
+    var layout = {"desktop": {
+                "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
+                  "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
+                  "plotTitle": {"x": 8, "y": 25}
+                },
+                "bottomRow": { "left": 41.0, "bottom": 33.0, "right": 24.0, "top": 0.0, "internal":{"large": 26.0, "small":21.0},
+                  "plot": {"left": 43.0, "bottom": 26.0, "right": 13.0, "top": 48.0},
+                  "plotTitle": {"x": 8, "y": 25}
+                },
+              },
+              "tablet": {},
+              "mobile": {}
+            };
+    var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
+    var bottomRowWidth = (containerWidth - layout.desktop.bottomRow.left - layout.desktop.bottomRow.right - layout.desktop.bottomRow.internal.large - layout.desktop.bottomRow.internal.small*3.0) * 0.25;
+
+    var drawScatter = function(variable){
+      var containerID = variable + "Plot"
+      var width = (variable === "unbanked" || variable == "underbanked") ? topRowWidth : bottomRowWidth;
+      var height = width;
+
+      var row = (variable === "unbanked" || variable == "underbanked") ? "topRow" : "bottomRow"
+      var formatter = (variable === "income") ? d3.format("$s") : d3.format("%");
+      var scatterMax = (variable === "income") ? SCATTER_MAX_DOLLARS : SCATTER_MAX_PERCENT;
+
+      var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "foreignBorn": "Percent Foreign Born"};
+
+      var svg = d3.select("#" + containerID)
+        .append("svg")
+        .attr("class", variable)
+        .attr("width", width)
+        .attr("height", height)
+
+      svg
+        .append("g")
+        .append("rect")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("width",width)
+        .attr("height", height)
+        .attr("class","plot background")
+
+      svg.append("text")
+        .text(titles[variable])
+        .attr("class","scatter title")
+        .attr("x",layout.desktop[row].plotTitle.x)
+        .attr("y",layout.desktop[row].plotTitle.y)
+
+      var x = d3.scale.linear()
+              .domain([2010.5, 2013.5])
+              .range([ layout.desktop[row].plot.left , width - layout.desktop[row].plot.right])
+
+      var y = d3.scale.linear()
+            .domain([0, scatterMax])
+            .range([ height - layout.desktop[row].plot.bottom, layout.desktop[row].plot.top]);
+
+      var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(SCATTER_TICKS)
+        .tickFormat(formatter);
+
+
+      y.ticks(SCATTER_TICKS).forEach(function(d){
+      svg.append("line")
+        .attr("class", "gridLine")
+        .attr("x1", x(2010.5))
+        .attr("x2", x(2013.5))
+        .attr("y1", y(d))
+        .attr("y2", y(d));
+      })   
+    
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom')
+        .tickValues([2011, 2013])
+        .tickSize(5,5,0)
+        .tickFormat(d3.format("0"));
+
+
+      svg.append("g")
+        .attr("class", "scatter x axis")
+        .attr("transform", "translate(0," + (height - layout.desktop[row].plot.bottom) + ")")
+        .call(xAxis);
+
+      svg.append("g")
+        .attr("class", "scatter y axis")
+        .attr("transform", "translate(" + layout.desktop[row].plot.left + ",0)")
+        .call(yAxis)
+      // console.log(data.get(1))
+      var nycData = data.get(1)
+
+      svg.append("line")
+        .attr("class", "scatter nyc connector")
+        .attr("x1", x(2011))
+        .attr("x2", x(2013))
+        .attr("y1", y(nycData[variable + "2011"]))
+        .attr("y2", y(nycData[variable + "2013"]))
+      svg.append("circle")
+        .attr("class","scatter nyc dot y2011")
+        .attr("cx", x(2011))
+        .attr("cy", y(nycData[variable + "2011"]))
+        .attr("r", DOT_RADIUS)
+      svg.append("circle")
+        .attr("class","scatter nyc dot y2013")
+        .attr("cx", x(2013))
+        .attr("cy", y(nycData[variable + "2013"]))
+        .attr("r", DOT_RADIUS)
+
+      svg.append("line")
+        .attr("class", "scatter borough connector")
+        .attr("x1", x(2011))
+        .attr("x2", x(2013))
+        .attr("y1", y(scatterMax * -.5))
+        .attr("y2", y(scatterMax * -.5))
+      svg.append("circle")
+        .attr("class","scatter borough dot y2011")
+        .attr("cx", x(2011))
+        .attr("cy", y(scatterMax * -.5))
+        .attr("r", DOT_RADIUS)
+      svg.append("circle")
+        .attr("class","scatter borough dot y2013")
+        .attr("cx", x(2013))
+        .attr("cy", y(scatterMax * -.5))
+        .attr("r", DOT_RADIUS)
+
+      svg.append("line")
+        .attr("class", "scatter puma connector")
+        .attr("x1", x(2011))
+        .attr("x2", x(2013))
+        .attr("y1", y(scatterMax * -.5))
+        .attr("y2", y(scatterMax * -.5))
+      svg.append("circle")
+        .attr("class","scatter puma dot y2011")
+        .attr("cx", x(2011))
+        .attr("cy", y(scatterMax * -.5))
+        .attr("r", DOT_RADIUS)
+      svg.append("circle")
+        .attr("class","scatter puma dot y2013")
+        .attr("cx", x(2013))
+        .attr("cy", y(scatterMax * -.5))
+        .attr("r", DOT_RADIUS)
+
+    }
+
+    var row = d3.select(".scatter.row")
+              .style("width", "100%")
+              .style("height", containerWidth*.725 + "px")
+
+    row.append("div")
+      .attr("id", "unbankedPlot")
+      .style("margin", layout.desktop.topRow.top + "px " + layout.desktop.topRow.internal.small + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.internal.large + "px")
+      .style("width", topRowWidth + "px")
+      .style("height", topRowWidth + "px")
+      .style("float", "left")
+
+    row.append("div")
+      .attr("id", "underbankedPlot")
+      .style("margin", layout.desktop.topRow.top + "px " + layout.desktop.topRow.right + "px " + layout.desktop.topRow.bottom + "px " + 0 + "px")
+      .style("width", topRowWidth + "px")
+      .style("height", topRowWidth + "px")
+      .style("float", "left")
+
+    row.append("div")
+      .attr("id", "povertyPlot")
+      .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.large + "px " + layout.desktop.bottomRow.bottom + "px " + layout.desktop.bottomRow.left + "px")
+      .style("width", bottomRowWidth + "px")
+      .style("height", bottomRowWidth + "px")
+      .style("float", "left")
+
+    row.append("div")
+      .attr("id", "incomePlot")
+      .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
+      .style("width", bottomRowWidth + "px")
+      .style("height", bottomRowWidth + "px")
+      .style("float", "left")
+
+    row.append("div")
+      .attr("id", "unemploymentPlot")
+      .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
+      .style("width", bottomRowWidth + "px")
+      .style("height", bottomRowWidth + "px")
+      .style("float", "left")
+
+    row.append("div")
+      .attr("id", "foreignBornPlot")
+      .style("margin", 0 + "px " + layout.desktop.bottomRow.right + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
+      .style("width", bottomRowWidth + "px")
+      .style("height", bottomRowWidth + "px")
+      .style("float","left")
+
+
+    drawScatter("unbanked")
+    drawScatter("underbanked")
+    drawScatter("poverty")
+    drawScatter("income")
+    drawScatter("unemployment")
+    drawScatter("foreignBorn")
+    pymChild.sendHeight()
+
+    dispatch.on("selectEntity.scatter", function(d){
+      var updateScatter = function(variable){
+        var BOROUGHS = {"Bronx": 2, "Manhattan": 3, "Staten": 4, "Brooklyn": 5, "Queens": 6}
+        var width = (variable === "unbanked" || variable == "underbanked") ? topRowWidth : bottomRowWidth;
+        var height = width;
+        var row = (variable === "unbanked" || variable == "underbanked") ? "topRow" : "bottomRow"
+        var scatterMax = (variable === "income") ? SCATTER_MAX_DOLLARS : SCATTER_MAX_PERCENT;
+        var y = d3.scale.linear()
+              .domain([0, scatterMax])
+              .range([ height - layout.desktop[row].plot.bottom, layout.desktop[row].plot.top]);
+        var svg = d3.select("svg." +  variable)
+        var boroughData = data.get(BOROUGHS[d.borough])
+
+        svg.select(".scatter.puma.dot.y2011")
+          .transition()
+          .attr("cy", y(d[variable + "2011"]));
+        svg.select(".scatter.puma.dot.y2013")
+          .transition()
+          .attr("cy", y(d[variable + "2013"]));
+        svg.select(".scatter.puma.connector")
+          .transition()
+          .attr("y1", y(d[variable + "2011"]))
+          .attr("y2", y(d[variable + "2013"]));
+
+        svg.select(".scatter.borough.dot.y2011")
+          .transition()
+          .attr("cy", y(boroughData[variable + "2011"]));
+        svg.select(".scatter.borough.dot.y2013")
+          .transition()
+          .attr("cy", y(boroughData[variable + "2013"]));
+        svg.select(".scatter.borough.connector")
+          .transition()
+          .attr("y1", y(boroughData[variable + "2011"]))
+          .attr("y2", y(boroughData[variable + "2013"]));
+
+      }
+
+      updateScatter("unbanked")
+      updateScatter("underbanked")
+      updateScatter("poverty")
+      updateScatter("income")
+      updateScatter("unemployment")
+      updateScatter("foreignBorn")
     })
+    
   });
 
 }
