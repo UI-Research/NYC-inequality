@@ -3,7 +3,7 @@ var COLORS =["#adcdec","#00a9e9","#1268b3","#013b82","#002e42"];
 var SCATTER_MAX_PERCENT = 0.5;
 var SCATTER_MAX_DOLLARS = 150000;
 var SCATTER_TICKS = 5;
-var DOT_RADIUS = 8;
+var DOT_RADIUS = 5;
 var layout = {"desktop": {
                 "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
                   "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
