@@ -107,24 +107,34 @@ function drawGraphic(containerWidth) {
   });
 
   dispatch.on("load.menu", function(data) {
-    var select = d3.select(".header.row")
-      .append("div")
-      .append("select")
-        .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
-    select.selectAll("option")
-        .data(data.values().filter(function(d){ return d.isPuma}).sort(
+
+    var values = data.values().filter(function(d){ return d.isPuma}).sort(
           function(a, b) {
             var textA = a.name.toUpperCase();
             var textB = b.name.toUpperCase();
             return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-          })
-        )
+          });
+
+    var select = d3.select(".header.row")
+      .append("div")
+      .classed("ui-widget", true)
+      .append("select")
+      .attr("id", "combobox")
+      .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
+    
+    select.selectAll("option")
+      .data(values)
       .enter().append("option")
-        .attr("value", function(d) { return d.id; })
-        .text(function(d) { return d.name; });
+      .attr("value", function(d) { return d.id; })
+      .text(function(d) { return d.name; });
+ 
+    $(function() {
+      $( "#combobox" ).combobox();
+    }); 
 
     dispatch.on("selectEntity.menu", function(puma) {
       select.property("value", puma.id);
+      d3.select("input").attr("value","foo")
     });
   });
 
@@ -603,5 +613,139 @@ function drawGraphic(containerWidth) {
   });
 
 }
+
+    (function( $ ) {
+      $.widget( "custom.combobox", {
+        _create: function() {
+          this.wrapper = $( "<span>" )
+            .addClass( "custom-combobox" )
+            .insertAfter( this.element );
+   
+          this.element.hide();
+          this._createAutocomplete();
+          this._createShowAllButton();
+        },
+ 
+        _createAutocomplete: function() {
+          var selected = this.element.children( ":selected" ),
+            value = selected.val() ? selected.text() : "";
+   
+          this.input = $( "<input>" )
+            .appendTo( this.wrapper )
+            .val( value )
+            .attr( "title", "" )
+            .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+            .autocomplete({
+              delay: 0,
+              minLength: 0,
+              source: $.proxy( this, "_source" )
+            })
+            .tooltip({
+              tooltipClass: "ui-state-highlight"
+            });
+ 
+          this._on( this.input, {
+            autocompleteselect: function( event, ui ) {
+              ui.item.option.selected = true;
+              this._trigger( "select", event, {
+                item: ui.item.option
+              });
+              console.log(ui.item.option.value)
+              dispatch.selectEntity(data.get(ui.item.option.value))
+            },
+   
+            autocompletechange: "_removeIfInvalid"
+          });
+        },
+ 
+        _createShowAllButton: function() {
+          var input = this.input,
+            wasOpen = false;
+   
+          $( "<a>" )
+            .attr( "tabIndex", -1 )
+            .attr( "title", "Show All Items" )
+            .tooltip()
+            .appendTo( this.wrapper )
+            .button({
+              icons: {
+                primary: "ui-icon-triangle-1-s"
+              },
+              text: false
+            })
+            .removeClass( "ui-corner-all" )
+            .addClass( "custom-combobox-toggle ui-corner-right" )
+            .mousedown(function() {
+              wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+            })
+            .click(function() {
+              input.focus();
+   
+              // Close if already visible
+              if ( wasOpen ) {
+                return;
+              }
+   
+              // Pass empty string as value to search for, displaying all results
+              input.autocomplete( "search", "" );
+            });
+        },
+ 
+        _source: function( request, response ) {
+          var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+          response( this.element.children( "option" ).map(function() {
+            var text = $( this ).text();
+            if ( this.value && ( !request.term || matcher.test(text) ) )
+              return {
+                label: text,
+                value: text,
+                option: this
+              };
+          }) );
+        },
+ 
+        _removeIfInvalid: function( event, ui ) {
+   
+          // Selected an item, nothing to do
+          if ( ui.item ) {
+            return;
+          }
+   
+          // Search for a match (case-insensitive)
+          var value = this.input.val(),
+            valueLowerCase = value.toLowerCase(),
+            valid = false;
+          this.element.children( "option" ).each(function() {
+            if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+              this.selected = valid = true;
+              return false;
+            }
+          });
+   
+          // Found a match, nothing to do
+          if ( valid ) {
+            return;
+          }
+   
+          // Remove invalid value
+          this.input
+            .val( "" )
+            .attr( "title", value + " didn't match any item" )
+            .tooltip( "open" );
+          this.element.val( "" );
+          this._delay(function() {
+            this.input.tooltip( "close" ).attr( "title", "" );
+          }, 2500 );
+          this.input.autocomplete( "instance" ).term = "";
+        },
+ 
+        _destroy: function() {
+          this.wrapper.remove();
+          this.element.show();
+        }
+      });
+    }) (jQuery)
+
+
 
 pymChild = new pym.Child({ renderCallback: drawGraphic });
