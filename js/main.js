@@ -17,6 +17,8 @@ var layout = {"desktop": {
               "tablet": {},
               "mobile": {}
         };
+// var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "sortBars");
+
 
 function drawGraphic(containerWidth) {
   var getTooltipX = function(x, d, width, context, tooltip){
@@ -100,6 +102,8 @@ function drawGraphic(containerWidth) {
   });
 
 
+
+
   dispatch.on("load", function(data) {
     $(".header.row").empty();
     $(".scatter.row").empty();
@@ -108,6 +112,138 @@ function drawGraphic(containerWidth) {
 
   dispatch.on("load.menu", function(data) {
 
+    (function( $ ) {
+      $.widget( "custom.combobox", {
+        _create: function() {
+          this.wrapper = $( "<span>" )
+            .addClass( "custom-combobox" )
+            .insertAfter( this.element );
+   
+          this.element.hide();
+          this._createAutocomplete();
+          this._createShowAllButton();
+        },
+ 
+        _createAutocomplete: function() {
+          var selected = this.element.children( ":selected" ),
+            value = selected.val() ? selected.text() : "";
+   
+          this.input = $( "<input>" )
+            .appendTo( this.wrapper )
+            .val( value )
+            .attr( "title", "" )
+            .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+            .autocomplete({
+              delay: 0,
+              minLength: 0,
+              source: $.proxy( this, "_source" )
+            })
+            .tooltip({
+              tooltipClass: "ui-state-highlight"
+            });
+ 
+          this._on( this.input, {
+            autocompleteselect: function( event, ui ) {
+              ui.item.option.selected = true;
+              this._trigger( "select", event, {
+                item: ui.item.option
+              });
+              console.log(ui.item.option.value)
+              dispatch.selectEntity(data.get(ui.item.option.value))
+            },
+   
+            autocompletechange: "_removeIfInvalid"
+          });
+        },
+ 
+        _createShowAllButton: function() {
+          var input = this.input,
+            wasOpen = false;
+   
+          $( "<a>" )
+            .attr( "tabIndex", -1 )
+            .attr( "title", "Show All Items" )
+            .tooltip()
+            .appendTo( this.wrapper )
+            .button({
+              icons: {
+                primary: "ui-icon-triangle-1-s"
+              },
+              text: false
+            })
+            .removeClass( "ui-corner-all" )
+            .addClass( "custom-combobox-toggle ui-corner-right" )
+            .mousedown(function() {
+              wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+            })
+            .click(function() {
+              input.focus();
+   
+              // Close if already visible
+              if ( wasOpen ) {
+                return;
+              }
+   
+              // Pass empty string as value to search for, displaying all results
+              input.autocomplete( "search", "" );
+            });
+        },
+ 
+        _source: function( request, response ) {
+          var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+          response( this.element.children( "option" ).map(function() {
+            var text = $( this ).text();
+            if ( this.value && ( !request.term || matcher.test(text) ) )
+              return {
+                label: text,
+                value: text,
+                option: this
+              };
+          }) );
+        },
+ 
+        _removeIfInvalid: function( event, ui ) {
+   
+          // Selected an item, nothing to do
+          if ( ui.item ) {
+            return;
+          }
+   
+          // Search for a match (case-insensitive)
+          var value = this.input.val(),
+            valueLowerCase = value.toLowerCase(),
+            valid = false;
+          this.element.children( "option" ).each(function() {
+            if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+              this.selected = valid = true;
+              return false;
+            }
+          });
+   
+          // Found a match, nothing to do
+          if ( valid ) {
+            return;
+          }
+   
+          // Remove invalid value
+          this.input
+            .val( "" )
+            .attr( "title", value + " didn't match any item" )
+            .tooltip( "open" );
+          this.element.val( "" );
+          this._delay(function() {
+            this.input.tooltip( "close" ).attr( "title", "" );
+          }, 2500 );
+          this.input.autocomplete( "instance" ).term = "";
+        },
+ 
+        _destroy: function() {
+          this.wrapper.remove();
+          this.element.show();
+        }
+      });
+    }) (jQuery)
+
     var values = data.values().filter(function(d){ return d.isPuma}).sort(
           function(a, b) {
             var textA = a.name.toUpperCase();
@@ -115,6 +251,66 @@ function drawGraphic(containerWidth) {
             return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
           });
 
+
+//Bottom menu
+    var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
+    var row = d3.select(".scatter.row")
+    var wrapper = row.append("div")
+      .attr("id", "bottomMenuContainer")
+      .style("height", topRowWidth + "px")
+      .style("width", (topRowWidth * 0.64) + "px")
+      .style("margin", layout.desktop.topRow.top + "px " + 0 + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.left + "px ")
+
+    wrapper.append("div")
+      .attr("class", "title")
+      .text("New York City Average")
+
+    wrapper.append("div")
+      .attr("class", "helpText")
+      .text("Select another neighborhood");
+
+    var bottomSelect = wrapper.append("div")
+      .classed("ui-widget", true)
+      .append("select")
+      .attr("id", "bottomCombobox")
+      .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
+
+    bottomSelect.selectAll("option")
+      .data(values)
+      .enter().append("option")
+      .attr("value", function(d) { return d.id; })
+      .text(function(d) { return d.name; });
+
+    var key = wrapper.append("svg")
+      .attr("width", topRowWidth * 0.64)
+      .attr("height", 40)
+
+    var nyc = key.append("g")
+
+    nyc.append("line")
+      .attr("class", "scatter nyc connector")
+      .attr("x1", 10)
+      .attr("x2", 65)
+      .attr("y1", 10)
+      .attr("y2", 10)     
+    nyc.append('circle')
+      .attr("class","scatter nyc dot key")
+      .attr("cx", 10)
+      .attr("cy", 10)
+      .attr("r", DOT_RADIUS)
+    nyc.append('circle')
+      .attr("class","scatter nyc dot key")
+      .attr("cx", 65)
+      .attr("cy", 10)
+      .attr("r", DOT_RADIUS)
+    nyc.append("text")
+      .attr("class", "scatter key text")
+      .attr("x", 85)
+      .attr("y", 15)
+      .text("NYC average")
+
+
+//Top menu
     var select = d3.select(".header.row")
       .append("div")
       .classed("ui-widget", true)
@@ -130,11 +326,12 @@ function drawGraphic(containerWidth) {
  
     $(function() {
       $( "#combobox" ).combobox();
+      $( "#bottomCombobox" ).combobox();
     }); 
 
     dispatch.on("selectEntity.menu", function(puma) {
       select.property("value", puma.id);
-      d3.select("input").attr("value","foo")
+      d3.select(".custom-combobox-input").node().value = puma.name
     });
   });
 
@@ -378,6 +575,11 @@ function drawGraphic(containerWidth) {
     });
   });
 
+  dispatch.on("load.bottomMenu", function(data){
+
+
+  })
+
   dispatch.on("load.scatter", function(data){
     var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
     var bottomRowWidth = (containerWidth - layout.desktop.bottomRow.left - layout.desktop.bottomRow.right - layout.desktop.bottomRow.internal.large - layout.desktop.bottomRow.internal.small*3.0) * 0.25;
@@ -523,7 +725,7 @@ function drawGraphic(containerWidth) {
 
     row.append("div")
       .attr("id", "underbankedPlot")
-      .style("margin", layout.desktop.topRow.top + "px " + layout.desktop.topRow.right + "px " + layout.desktop.topRow.bottom + "px " + 0 + "px")
+      .style("margin", layout.desktop.topRow.top + "px " + 0 + "px " + layout.desktop.topRow.bottom + "px " + 0 + "px")
       .style("width", topRowWidth + "px")
       .style("height", topRowWidth + "px")
       .style("float", "left")
@@ -614,137 +816,7 @@ function drawGraphic(containerWidth) {
 
 }
 
-    (function( $ ) {
-      $.widget( "custom.combobox", {
-        _create: function() {
-          this.wrapper = $( "<span>" )
-            .addClass( "custom-combobox" )
-            .insertAfter( this.element );
-   
-          this.element.hide();
-          this._createAutocomplete();
-          this._createShowAllButton();
-        },
- 
-        _createAutocomplete: function() {
-          var selected = this.element.children( ":selected" ),
-            value = selected.val() ? selected.text() : "";
-   
-          this.input = $( "<input>" )
-            .appendTo( this.wrapper )
-            .val( value )
-            .attr( "title", "" )
-            .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
-            .autocomplete({
-              delay: 0,
-              minLength: 0,
-              source: $.proxy( this, "_source" )
-            })
-            .tooltip({
-              tooltipClass: "ui-state-highlight"
-            });
- 
-          this._on( this.input, {
-            autocompleteselect: function( event, ui ) {
-              ui.item.option.selected = true;
-              this._trigger( "select", event, {
-                item: ui.item.option
-              });
-              console.log(ui.item.option.value)
-              dispatch.selectEntity(data.get(ui.item.option.value))
-            },
-   
-            autocompletechange: "_removeIfInvalid"
-          });
-        },
- 
-        _createShowAllButton: function() {
-          var input = this.input,
-            wasOpen = false;
-   
-          $( "<a>" )
-            .attr( "tabIndex", -1 )
-            .attr( "title", "Show All Items" )
-            .tooltip()
-            .appendTo( this.wrapper )
-            .button({
-              icons: {
-                primary: "ui-icon-triangle-1-s"
-              },
-              text: false
-            })
-            .removeClass( "ui-corner-all" )
-            .addClass( "custom-combobox-toggle ui-corner-right" )
-            .mousedown(function() {
-              wasOpen = input.autocomplete( "widget" ).is( ":visible" );
-            })
-            .click(function() {
-              input.focus();
-   
-              // Close if already visible
-              if ( wasOpen ) {
-                return;
-              }
-   
-              // Pass empty string as value to search for, displaying all results
-              input.autocomplete( "search", "" );
-            });
-        },
- 
-        _source: function( request, response ) {
-          var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
-          response( this.element.children( "option" ).map(function() {
-            var text = $( this ).text();
-            if ( this.value && ( !request.term || matcher.test(text) ) )
-              return {
-                label: text,
-                value: text,
-                option: this
-              };
-          }) );
-        },
- 
-        _removeIfInvalid: function( event, ui ) {
-   
-          // Selected an item, nothing to do
-          if ( ui.item ) {
-            return;
-          }
-   
-          // Search for a match (case-insensitive)
-          var value = this.input.val(),
-            valueLowerCase = value.toLowerCase(),
-            valid = false;
-          this.element.children( "option" ).each(function() {
-            if ( $( this ).text().toLowerCase() === valueLowerCase ) {
-              this.selected = valid = true;
-              return false;
-            }
-          });
-   
-          // Found a match, nothing to do
-          if ( valid ) {
-            return;
-          }
-   
-          // Remove invalid value
-          this.input
-            .val( "" )
-            .attr( "title", value + " didn't match any item" )
-            .tooltip( "open" );
-          this.element.val( "" );
-          this._delay(function() {
-            this.input.tooltip( "close" ).attr( "title", "" );
-          }, 2500 );
-          this.input.autocomplete( "instance" ).term = "";
-        },
- 
-        _destroy: function() {
-          this.wrapper.remove();
-          this.element.show();
-        }
-      });
-    }) (jQuery)
+
 
 
 

@@ -1,3 +1,7 @@
+body{
+	font: 12pt HelveticaNeue;
+}
+
 /************* JQUERY AUTOCOMPLETE STYLES ********************/
 .custom-combobox {
 	position: relative;
@@ -50,6 +54,20 @@
 }
 .bar.tooltip .name{
 	font: 12pt HelveticaNeue-Bold;
+}
+
+/************* BOTTOM MENU STYLES ********************/
+#bottomMenuContainer{
+	float: left;
+}
+
+#bottomMenuContainer .title{
+	font: 26pt HelveticaNeue-Bold;
+}
+
+.helpText{
+	font-style: italic;
+	font-weight: 200;
 }
 
 /************* SCATTER PLOT STYLES ********************/
