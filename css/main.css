@@ -25,6 +25,10 @@
 .bucket_5{fill:#002e42;}
 
 
+.bar.tooltip .background{
+	fill: #fff;
+	opacity: .8
+}
 .bar.tooltip .value{
 	font: 14pt HelveticaNeue-Bold;
 }

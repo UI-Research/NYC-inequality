@@ -3,7 +3,7 @@ var COLORS =["#adcdec","#00a9e9","#1268b3","#013b82","#002e42"];
 var SCATTER_MAX_PERCENT = 0.5;
 var SCATTER_MAX_DOLLARS = 150000;
 var SCATTER_TICKS = 5;
-var DOT_RADIUS = 5;
+var DOT_RADIUS = 8;
 var layout = {"desktop": {
                 "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
                   "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
@@ -19,6 +19,14 @@ var layout = {"desktop": {
         };
 
 function drawGraphic(containerWidth) {
+  var getTooltipX = function(x, d, width, context, tooltip){
+    if (d3.select("svg.bars").attr("width") > (width - x(d[context]) + 67) + tooltip.node().getBBox().width){
+      return (width - x(d[context]) + 7)
+    }
+    else{
+      return d3.select("svg.bars").attr("width")/2
+    }
+  }
   var getContext = function(type, year){
     var typeName = d3.select(type)
                     .attr('class')
@@ -153,6 +161,7 @@ function drawGraphic(containerWidth) {
 
   // A bar chart to show total population; uses the "bar" namespace.
   dispatch.on("load.bar", function(data) {
+    var formatter = d3.format(".1%")
     var barAspectHeight = 15; 
     var barAspectWidth = 7;
     var margin = {top: 0, right: 20, bottom: 15, left: 18},
@@ -193,7 +202,6 @@ function drawGraphic(containerWidth) {
         .attr("class", "bar y axis")
         .call(yAxis)
     var nycData = data.get(1)
-    console.log(nycData)
     svg.append("line")
       .attr("class", "nycDashedLine")
       .style("stroke-dasharray", ("1, 3"))
@@ -208,9 +216,9 @@ function drawGraphic(containerWidth) {
 
     svg.append("text")
       .attr("class","nycText")
-      .attr("y", height*.91)
+      .attr("y", height*.907)
       .attr("x", (width - x(nycData.unbanked2013) + 15))
-      .text("NYC")
+      .text("NYC, " + formatter(nycData.unbanked2013))
 
 
     svg.selectAll("rect.bar")
@@ -228,36 +236,58 @@ function drawGraphic(containerWidth) {
 
     var tooltip = svg.append("g")
       .attr("class", "bar tooltip")
+      
 
     tooltip.append("text")
       .attr("class", "value")
-
-    tooltip.append("text")
-      .attr("class", "name")
-      .attr("y", 20)
 
     dispatch.on("selectEntity.bar", function(d) {
       d3.selectAll(".bar").classed("selected",false)
       var selected = d3.select(".bar.fips_" + d.id).classed("selected",true)
       var context = selected.attr("value")
-      var formatter = d3.format(".1%")
-      tooltip
-        .attr("transform", "translate(" + (width - x(d[context]) + 7) + "," + (y(d.name)+12) +")")
 
+      tooltip
+        .datum(d)
+        .transition()
+        .duration(200)
+        .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
+
+      d3.selectAll(".tooltip .name").remove()
+      d3.selectAll(".tooltip .background").remove()
+
+      var names = d.name.split("/")
+      for(var i=0; i<names.length; i++){
+        var lineEnd = (i+1 == names.length) ? "":" /";
+        tooltip.append("text")
+          .attr("class","name")
+          .attr("y", (i+1)*20)
+          .text(names[i].trim() + lineEnd)
+      }
       tooltip.select(".value")
         .text(formatter(d[context]))
-      tooltip.select(".name")
-        .text(d.name)
+
+      var bbox = tooltip.node().getBBox();
+      tooltip.insert("rect", ".value")
+        .attr("class","background")
+        .attr("x",-5)
+        .attr("y",-20)
+        .attr("width",bbox.width + 10)
+        .attr("height",bbox.height + 10)
+
 
     });
 
     dispatch.on("changeContext.bar", function(type, year) {
       var context = getContext(type, year);
       values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a[context] - b[context]}).reverse()
+      var unsorted = data.values().filter(function(d){ return d.isPuma})
 
-      y = d3.scale.ordinal()
-        .rangeRoundBands([0, height], .1)
-        .domain(values.map(function(d) { return d.name; }));
+      if(d3.selectAll('.bar.tooltip .name').node()){
+        d3.selectAll('.bar.tooltip')  
+          .transition()
+          .duration(600)
+          .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
+      }
 
       d3.select(".nycDashedLine")
         .transition()
@@ -272,6 +302,7 @@ function drawGraphic(containerWidth) {
         .transition()
         .duration(800)
         .attr("x", (width - x(nycData[context]) + 15))
+        .text("NYC, " + formatter(nycData[context]))
 
 
       d3.selectAll("rect.bar")
@@ -282,11 +313,25 @@ function drawGraphic(containerWidth) {
           return getColor(d,context)
         })
         .attr("width",function(d){ return width - x(d[context])})
+
     });
 
     dispatch.on("sortBars.bar", function(type,year){
+      var context = getContext(type, year);
+
+      y = d3.scale.ordinal()
+        .rangeRoundBands([0, height], .1)
+        .domain(values.map(function(d) { return d.name; }));
+
+      d3.selectAll('.bar.tooltip')
+        .transition()
+        .ease("back")
+        .delay(300)
+        .duration(400)
+        .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
+
       svg.selectAll("rect.bar")
-      .sort(function(a,b){return a[getContext(type,year)] - b[getContext(type,year)]})
+      .sort(function(a,b){return a[context] - b[context]})
         .transition()
         .delay(function (d, i) {
           return i * 5;
@@ -400,7 +445,6 @@ function drawGraphic(containerWidth) {
         .attr("class", "scatter y axis")
         .attr("transform", "translate(" + layout.desktop[row].plot.left + ",0)")
         .call(yAxis)
-      // console.log(data.get(1))
       var nycData = data.get(1)
 
       svg.append("line")
