@@ -2,6 +2,10 @@ body{
 	font: 12pt HelveticaNeue;
 }
 
+:focus{
+	outline: none;
+}
+
 /************* JQUERY AUTOCOMPLETE STYLES ********************/
 .custom-combobox {
 	position: relative;
@@ -70,6 +74,32 @@ body{
 	font-weight: 200;
 }
 
+#bottomMenuContainer input{
+  width: 60%;
+  height: 17px;
+  background: #f2f2f2;
+  border: none;
+  color: #cccccc;
+}
+
+#bottomMenuContainer a.ui-button{
+  height: 27px;
+  top: -2px;
+  background: #f2f2f2;
+  border: none;
+  color: #cccccc;
+  border-radius: 0px;
+  background-image: url("../img/menu-arrow.png");
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: 33%;
+  border-left: 1px solid;
+}
+
+#bottomMenuContainer span{
+	background-image: none;
+}
+
 /************* SCATTER PLOT STYLES ********************/
 .plot.background{
 	fill: #f2f2f2;
@@ -114,6 +144,10 @@ body{
 .scatter.puma{
 	stroke: #ff6d22;
 }
+.scatter.temp{
+	stroke: #cccccc;
+}
+
 
 .scatter.connector{
 	stroke-width: 3pt;

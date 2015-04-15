@@ -94,8 +94,8 @@ function drawGraphic(containerWidth) {
         "income2013": parseFloat(d["median-income-2013 "]),
         "unemployment2011": parseFloat(d["unemployment-2011"]),
         "unemployment2013": parseFloat(d["unemployment-2013"]),
-        "foreignBorn2011": parseFloat(d["foreign-born-2011"]),
-        "foreignBorn2013": parseFloat(d["foreign-born-2013"])
+        "prepaid2011": parseFloat(d["Prepaid-2011-New-Definition"]),
+        "prepaid2013": parseFloat(d["Prepaid-2013-New-Definition"])
       });
     });
     dispatch.load(data);
@@ -148,7 +148,6 @@ function drawGraphic(containerWidth) {
               this._trigger( "select", event, {
                 item: ui.item.option
               });
-              console.log(ui.item.option.value)
               dispatch.selectEntity(data.get(ui.item.option.value))
             },
    
@@ -162,8 +161,6 @@ function drawGraphic(containerWidth) {
    
           $( "<a>" )
             .attr( "tabIndex", -1 )
-            .attr( "title", "Show All Items" )
-            .tooltip()
             .appendTo( this.wrapper )
             .button({
               icons: {
@@ -261,7 +258,7 @@ function drawGraphic(containerWidth) {
       .style("width", (topRowWidth * 0.64) + "px")
       .style("margin", layout.desktop.topRow.top + "px " + 0 + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.left + "px ")
 
-    wrapper.append("div")
+    var title = wrapper.append("div")
       .attr("class", "title")
       .text("New York City Average")
 
@@ -284,26 +281,31 @@ function drawGraphic(containerWidth) {
     var key = wrapper.append("svg")
       .attr("width", topRowWidth * 0.64)
       .attr("height", 40)
+    
+    var pumaKey = key.append("g")
+              .attr("class", "puma")
+    var boroughKey = key.append("g")
+              .attr("class", "borough")
+    var nycKey = key.append("g")
+              .attr("class", "nyc")
 
-    var nyc = key.append("g")
-
-    nyc.append("line")
+    nycKey.append("line")
       .attr("class", "scatter nyc connector")
       .attr("x1", 10)
       .attr("x2", 65)
       .attr("y1", 10)
       .attr("y2", 10)     
-    nyc.append('circle')
+    nycKey.append('circle')
       .attr("class","scatter nyc dot key")
       .attr("cx", 10)
       .attr("cy", 10)
       .attr("r", DOT_RADIUS)
-    nyc.append('circle')
+    nycKey.append('circle')
       .attr("class","scatter nyc dot key")
       .attr("cx", 65)
       .attr("cy", 10)
       .attr("r", DOT_RADIUS)
-    nyc.append("text")
+    nycKey.append("text")
       .attr("class", "scatter key text")
       .attr("x", 85)
       .attr("y", 15)
@@ -330,8 +332,42 @@ function drawGraphic(containerWidth) {
     }); 
 
     dispatch.on("selectEntity.menu", function(puma) {
+//Top Menu      
       select.property("value", puma.id);
-      d3.select(".custom-combobox-input").node().value = puma.name
+//Bottom Menu
+      title.text(puma.name)
+
+      key.transition()
+        .attr("height", 120)
+
+      nycKey.transition()
+        .attr("transform", "translate(0,30)")
+
+      boroughKey.append("line")
+        .transition()
+        .attr("class", "scatter nyc connector")
+        .attr("x1", 10)
+        .attr("x2", 65)
+        .attr("y1", 10)
+        .attr("y2", 10)     
+      boroughKey.append('circle')
+        .transition()
+        .attr("class","scatter nyc dot key")
+        .attr("cx", 10)
+        .attr("cy", 10)
+        .attr("r", DOT_RADIUS)
+      boroughKey.append('circle')
+        .transition()
+        .attr("class","scatter nyc dot key")
+        .attr("cx", 65)
+        .attr("cy", 10)
+        .attr("r", DOT_RADIUS)
+      boroughKey.append("text")
+        .transition()
+        .attr("class", "scatter key text")
+        .attr("x", 85)
+        .attr("y", 15)
+        .text("Borough average")
     });
   });
 
@@ -366,7 +402,6 @@ function drawGraphic(containerWidth) {
     d3.select(year).classed("selected", true)
   })
 
-  // A bar chart to show total population; uses the "bar" namespace.
   dispatch.on("load.bar", function(data) {
     var formatter = d3.format(".1%")
     var barAspectHeight = 15; 
@@ -593,7 +628,7 @@ function drawGraphic(containerWidth) {
       var formatter = (variable === "income") ? d3.format("$s") : d3.format("%");
       var scatterMax = (variable === "income") ? SCATTER_MAX_DOLLARS : SCATTER_MAX_PERCENT;
 
-      var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "foreignBorn": "Percent Foreign Born"};
+      var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "prepaid": "Percent Prepaid"};
 
       var svg = d3.select("#" + containerID)
         .append("svg")
@@ -658,6 +693,27 @@ function drawGraphic(containerWidth) {
         .attr("transform", "translate(" + layout.desktop[row].plot.left + ",0)")
         .call(yAxis)
       var nycData = data.get(1)
+
+      for(var i = 2; i<6; i++){
+        var boroughData = data.get(i)
+        var className = boroughData.name.replace(" ","_")
+        svg.append("line")
+          .attr("class", "scatter connector temp " + className)
+          .attr("x1", x(2011))
+          .attr("x2", x(2013))
+          .attr("y1", y(boroughData[variable + "2011"]))
+          .attr("y2", y(boroughData[variable + "2013"]))
+        svg.append("circle")
+          .attr("class","scatter dot y2011 temp " + className)
+          .attr("cx", x(2011))
+          .attr("cy", y(boroughData[variable + "2011"]))
+          .attr("r", DOT_RADIUS)
+        svg.append("circle")
+          .attr("class","scatter nyc dot y2013 temp " + className)
+          .attr("cx", x(2013))
+          .attr("cy", y(boroughData[variable + "2013"]))
+          .attr("r", DOT_RADIUS)
+        }
 
       svg.append("line")
         .attr("class", "scatter nyc connector")
@@ -752,7 +808,7 @@ function drawGraphic(containerWidth) {
       .style("float", "left")
 
     row.append("div")
-      .attr("id", "foreignBornPlot")
+      .attr("id", "prepaidPlot")
       .style("margin", 0 + "px " + layout.desktop.bottomRow.right + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
       .style("width", bottomRowWidth + "px")
       .style("height", bottomRowWidth + "px")
@@ -764,7 +820,7 @@ function drawGraphic(containerWidth) {
     drawScatter("poverty")
     drawScatter("income")
     drawScatter("unemployment")
-    drawScatter("foreignBorn")
+    drawScatter("prepaid")
     pymChild.sendHeight()
 
     dispatch.on("selectEntity.scatter", function(d){
@@ -779,6 +835,16 @@ function drawGraphic(containerWidth) {
               .range([ height - layout.desktop[row].plot.bottom, layout.desktop[row].plot.top]);
         var svg = d3.select("svg." +  variable)
         var boroughData = data.get(BOROUGHS[d.borough])
+
+        svg.selectAll("circle.temp")
+          .transition()
+          .duration(800)
+          .attr("cy", 400)
+        svg.selectAll("line.temp")
+          .transition()
+          .duration(800)
+          .attr("y1", 400)
+          .attr("y2", 400)
 
         svg.select(".scatter.puma.dot.y2011")
           .transition()
@@ -809,7 +875,7 @@ function drawGraphic(containerWidth) {
       updateScatter("poverty")
       updateScatter("income")
       updateScatter("unemployment")
-      updateScatter("foreignBorn")
+      updateScatter("prepaid")
     })
     
   });
