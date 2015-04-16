@@ -141,6 +141,10 @@ body{
 .scatter.borough{
 	stroke: #999999;
 }
+.scatter.text{
+	stroke: none !important;
+	font: 12pt HelveticaNeue-Bold;
+}
 .scatter.puma{
 	stroke: #ff6d22;
 }

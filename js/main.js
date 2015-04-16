@@ -21,6 +21,11 @@ var layout = {"desktop": {
 
 
 function drawGraphic(containerWidth) {
+  var formatBorough = function(borough){
+    if (borough == "Staten"){ return "Staten Island";}
+    else if (borough == "Bronx"){ return "The Bronx";}
+    else { return borough;}
+  }
   var getTooltipX = function(x, d, width, context, tooltip){
     if (d3.select("svg.bars").attr("width") > (width - x(d[context]) + 67) + tooltip.node().getBBox().width){
       return (width - x(d[context]) + 7)
@@ -283,33 +288,35 @@ function drawGraphic(containerWidth) {
       .attr("height", 40)
     
     var pumaKey = key.append("g")
-              .attr("class", "puma")
+              .attr("class", "puma");
+        pumaKey.append("text");
     var boroughKey = key.append("g")
-              .attr("class", "borough")
+              .attr("class", "borough");
+        boroughKey.append("text");
     var nycKey = key.append("g")
-              .attr("class", "nyc")
+              .attr("class", "nyc");
 
     nycKey.append("line")
       .attr("class", "scatter nyc connector")
       .attr("x1", 10)
       .attr("x2", 65)
       .attr("y1", 10)
-      .attr("y2", 10)     
+      .attr("y2", 10);     
     nycKey.append('circle')
       .attr("class","scatter nyc dot key")
       .attr("cx", 10)
       .attr("cy", 10)
-      .attr("r", DOT_RADIUS)
+      .attr("r", DOT_RADIUS);
     nycKey.append('circle')
       .attr("class","scatter nyc dot key")
       .attr("cx", 65)
       .attr("cy", 10)
-      .attr("r", DOT_RADIUS)
+      .attr("r", DOT_RADIUS);
     nycKey.append("text")
       .attr("class", "scatter key text")
       .attr("x", 85)
       .attr("y", 15)
-      .text("NYC average")
+      .text("NYC average");
 
 
 //Top menu
@@ -332,42 +339,82 @@ function drawGraphic(containerWidth) {
     }); 
 
     dispatch.on("selectEntity.menu", function(puma) {
+      var lines = puma.name.split("/");
+      var lineCount = lines.length;
 //Top Menu      
       select.property("value", puma.id);
 //Bottom Menu
-      title.text(puma.name)
+      title.text(puma.name);
 
       key.transition()
-        .attr("height", 120)
+        .attr("height", 120);
 
       nycKey.transition()
-        .attr("transform", "translate(0,30)")
+        .attr("transform", "translate(0," + (60 + (lineCount-1)*15) +")");
+      boroughKey.transition()
+        .attr("transform", "translate(0," + (30 + (lineCount-1)*15) +")");
 
+      boroughKey.selectAll(".scatter").remove();
       boroughKey.append("line")
         .transition()
-        .attr("class", "scatter nyc connector")
+        .attr("class", "scatter borough connector")
         .attr("x1", 10)
         .attr("x2", 65)
         .attr("y1", 10)
-        .attr("y2", 10)     
+        .attr("y2", 10);
       boroughKey.append('circle')
         .transition()
-        .attr("class","scatter nyc dot key")
+        .attr("class","scatter borough dot key")
         .attr("cx", 10)
         .attr("cy", 10)
-        .attr("r", DOT_RADIUS)
+        .attr("r", DOT_RADIUS);
       boroughKey.append('circle')
         .transition()
-        .attr("class","scatter nyc dot key")
+        .attr("class","scatter borough dot key")
         .attr("cx", 65)
         .attr("cy", 10)
-        .attr("r", DOT_RADIUS)
-      boroughKey.append("text")
+        .attr("r", DOT_RADIUS);
+      boroughKey
+        .append("text")
         .transition()
-        .attr("class", "scatter key text")
+        .attr("class", "scatter borough text")
         .attr("x", 85)
         .attr("y", 15)
-        .text("Borough average")
+        .text(formatBorough(puma.borough));
+
+      pumaKey.selectAll(".scatter").remove();
+      pumaKey.append("line")
+        .transition()
+        .attr("class", "scatter puma connector")
+        .attr("x1", 10)
+        .attr("x2", 65)
+        .attr("y1", 10)
+        .attr("y2", 10);
+      pumaKey.append('circle')
+        .transition()
+        .attr("class","scatter puma dot key")
+        .attr("cx", 10)
+        .attr("cy", 10)
+        .attr("r", DOT_RADIUS);
+      pumaKey.append('circle')
+        .transition()
+        .attr("class","scatter puma dot key")
+        .attr("cx", 65)
+        .attr("cy", 10)
+        .attr("r", DOT_RADIUS);
+      
+      for (var i = 0; i<lineCount; i++){
+        pumaKey
+          .append("text")
+          .transition()
+          .attr("class", "scatter puma text")
+          .attr("x", 85)
+          .attr("y", 15*(i+1))
+          .text(function(){ 
+            if (i != lineCount-1){ return lines[i].trim() + "/" }
+            else{ return lines[i]}
+          });
+      }
     });
   });
 
@@ -406,7 +453,7 @@ function drawGraphic(containerWidth) {
     var formatter = d3.format(".1%")
     var barAspectHeight = 15; 
     var barAspectWidth = 7;
-    var margin = {top: 0, right: 20, bottom: 15, left: 18},
+    var margin = {top: 0, right: 20, bottom: 35, left: 18},
         width = containerWidth*.3 - margin.left - margin.right,
         height = Math.ceil((width * barAspectHeight) / barAspectWidth) - margin.top - margin.bottom;
 
