@@ -21,6 +21,37 @@ var layout = {"desktop": {
 
 
 function drawGraphic(containerWidth) {
+
+var scrollDown = function(){
+  window.parent.scrollFunc();
+}
+
+// wrap function modified from http://bl.ocks.org/mbostock/7555321
+  var wrap = function(text, width) {
+    text.each(function() {
+      var text = d3.select(this),
+          words = text.text().split(/\s+/).reverse(),
+          word,
+          line = [],
+          lineNumber = 0,
+          lineHeight = 1.1, // ems
+          y = text.attr("y"),
+          x = text.attr("x"),
+          dy = parseFloat(text.attr("dy")),
+          tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+      while (word = words.pop()) {
+        line.push(word);
+        tspan.text(line.join(" "));
+        if (tspan.node().getComputedTextLength() > width) {
+          line.pop();
+          tspan.text(line.join(" "));
+          line = [word];
+          tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+        }
+      }
+    });
+  }
+
   var formatBorough = function(borough){
     if (borough == "Staten"){ return "Staten Island";}
     else if (borough == "Bronx"){ return "The Bronx";}
@@ -77,7 +108,7 @@ function drawGraphic(containerWidth) {
   return -1;
 }
 
-  var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "sortBars");
+  var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "sortBars", "bucketHighlight");
 
   d3.csv("../data/data.csv", function(error, pumas) {
     if (error) throw error;
@@ -628,6 +659,19 @@ function drawGraphic(containerWidth) {
         .duration(500)
         .attr("y",function(d) {return y(d.name); })
     });
+
+    dispatch.on("bucketHighlight.bar", function(bucket){
+      d3.selectAll(".bar").classed("deemphasized", true)
+      d3.selectAll("path.puma").classed("deemphasized", true)
+      var bars = d3.selectAll(".bar." + bucket)
+      var fipsClasses = []
+      bars.each(function(){
+        var fipsClass = d3.select(this).attr("class").match(/\sfips_\d*\s/g)[0].trim()
+        d3.select("path.puma."+fipsClass).classed("deemphasized", false)
+      })
+
+      bars.classed("deemphasized", false)
+    });
   });
 
   dispatch.on("selectEntity.puma", function(d) {
@@ -657,10 +701,73 @@ function drawGraphic(containerWidth) {
     });
   });
 
-  dispatch.on("load.bottomMenu", function(data){
+  dispatch.on("load.key", function(data){
+    d3.select(".map.legend").remove();
 
+    var svg = d3.select(".map.row")
+      .insert("div", "svg.map")
+      .attr("class", "map legend")
+      .style("position", "absolute")
+      .append("svg")
 
+    svg.append("rect")
+      .attr("width", 235)
+      .attr("height", 131)
+      .attr("x", 7)
+      .attr("y", 7)
+      .style("fill", "#fff")
+
+    svg.append("text")
+      .attr("class", "legend title")
+      .attr("x", 16)
+      .attr("y", 29)
+      .text("Percent Unbanked, 2013")
+
+    svg.append("text")
+        .attr("class", "legend label")
+        .attr("x", 12)
+        .attr("y", 75)
+        .text("0%")
+
+    for(var i = 0; i < 5; i++){
+      svg.append("rect")
+        .attr("class", "legend key bucket_" + (i+1))
+        .attr("x", 16 + (i*43))
+        .attr("y", 39)
+        .attr("width", 43)
+        .attr("height", 21)
+        .on("mouseover", function(){ dispatch.bucketHighlight( d3.select(this).attr("class").replace("legend","").replace("key","").trim() ) })
+        .on("mouseout", function(){ d3.selectAll(".deemphasized").classed("deemphasized", false)})
+
+      svg.append("text")
+        .attr("class", "legend label")
+        .attr("x", -3 + ((i+1)*43))
+        .attr("y", 75)
+        .text((i+1)*10 + "%")
+    }
+    var pumaName = svg.append("text")
+      .attr("class", "legend title")
+      .attr("x", 16)
+      .attr("y", 105)
+      .attr("dy",0)
+      .text("New York City Average")
+      .call(wrap, 130)
+
+    var formatter = d3.format("%")
+    svg.append("text")
+      .attr("class","legend nyc value")
+      .attr("x", 150)
+      .attr("y", 105)
+      .text(formatter(data.get(1).unbanked2013))
+    svg.append("text")
+      .attr("class", "legend more")
+      .attr("x", 155)
+      .attr("y", 125)
+      .text("Click for more")
+      .on("click", scrollDown)
   })
+
+
 
   dispatch.on("load.scatter", function(data){
     var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;

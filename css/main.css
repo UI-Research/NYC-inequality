@@ -60,6 +60,9 @@ body{
 	font: 12pt HelveticaNeue-Bold;
 }
 
+.deemphasized{
+	fill: #cccccc !important;
+}
 /************* BOTTOM MENU STYLES ********************/
 #bottomMenuContainer{
 	float: left;
@@ -164,6 +167,25 @@ svg.map{
 .barContainer{
 	width:30%;
 	float: right;
+}
+
+/************* MAP LEGEND STYLES ********************/
+.legend.title{
+	font: 12pt HelveticaNeue-Bold;
+}
+.legend.label{
+	font: 9pt HelveticaNeue;
+}
+.legend.key{
+	stroke: #ffffff;
+	stroke-width: 2px;
+}
+.legend.nyc.value{
+	font: 20pt HelveticaNeue-Bold;
+}
+.legend.more{
+	font: 9pt HelveticaNeue-Italic;
+	font-style: italic;
 }
 /************* STYLES FROM ILLUSTRATOR ********************/
 
