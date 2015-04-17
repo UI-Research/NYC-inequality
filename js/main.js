@@ -563,7 +563,8 @@ var scrollDown = function(){
         .attr("height", y.rangeBand())
         .attr("x", 0)
         .attr("width", function(d) { return width - x(d.unbanked2013); })
-        .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); });
+        .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); })
+        // .on("mouseout", function(){ d3.selectAll(".selected").classed("selected", false) })
 
     var tooltip = svg.append("g")
       .attr("class", "bar tooltip")
@@ -637,7 +638,7 @@ var scrollDown = function(){
 
 
       d3.selectAll("rect.bar")
-              .classed("bucket_1", function(d){ console.log(checkClass(d, context, 1)); return checkClass(d, context, 1) }) 
+        .classed("bucket_1", function(d){ return checkClass(d, context, 1) }) 
         .classed("bucket_2", function(d){ return checkClass(d, context, 2) })
         .classed("bucket_3", function(d){ return checkClass(d, context, 3) }) 
         .classed("bucket_4", function(d){ return checkClass(d, context, 4) }) 
@@ -660,13 +661,16 @@ var scrollDown = function(){
       y = d3.scale.ordinal()
         .rangeRoundBands([0, height], .1)
         .domain(values.map(function(d) { return d.name; }));
-
+      // console.log(d3.selectAll(".bar.tooltip"))
       d3.selectAll('.bar.tooltip')
         .transition()
         .ease("back")
         .delay(300)
         .duration(400)
-        .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
+        .attr("transform", function(d) { if(typeof(d) != "undefined") {
+          return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")"
+        } else { return null}
+        })
 
       svg.selectAll("rect.bar")
       .sort(function(a,b){return a[context] - b[context]})
@@ -704,6 +708,7 @@ var scrollDown = function(){
       .datum(d)
       .style("fill", getColor(d, "unbanked2013"))
       .on("mouseover",function(d){ dispatch.selectEntity(data.get(d.id)) })
+      // .on("mouseout", function(){ d3.selectAll(".selected").classed("selected", false) })
     });
 
     dispatch.on("changeContext.map", function(type,year){
