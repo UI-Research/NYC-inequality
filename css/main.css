@@ -169,6 +169,13 @@ svg.map{
 	float: right;
 }
 
+.map.borough.name{
+	fill: #ffffff;
+	font: 12pt HelveticaNeue-Bold;
+}
+.shadow{
+	fill: #000000 !important;
+}
 /************* MAP LEGEND STYLES ********************/
 .legend.title{
 	font: 12pt HelveticaNeue-Bold;

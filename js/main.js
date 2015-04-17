@@ -1,9 +1,13 @@
 var BREAKS = [0,0.1,0.2,0.3,0.4,0.5];
 var COLORS =["#adcdec","#00a9e9","#1268b3","#013b82","#002e42"];
 var SCATTER_MAX_PERCENT = 0.5;
+var SCATTER_MAX_PREPAID = 0.2;
 var SCATTER_MAX_DOLLARS = 150000;
 var SCATTER_TICKS = 5;
 var DOT_RADIUS = 8;
+
+var desktop = true;
+
 var layout = {"desktop": {
                 "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
                   "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
@@ -716,6 +720,9 @@ var scrollDown = function(){
   });
 
   dispatch.on("load.key", function(data){
+    var mapWidth = (desktop) ? containerWidth : containerWidth+1
+    var mapHeight = containerWidth
+
     d3.select(".map.legend").remove();
 
     var svg = d3.select(".map.row")
@@ -723,6 +730,9 @@ var scrollDown = function(){
       .attr("class", "map legend")
       .style("position", "absolute")
       .append("svg")
+      .attr("width", mapWidth)
+      .attr("height", mapHeight)
+
 
     svg.append("rect")
       .attr("width", 235)
@@ -779,6 +789,104 @@ var scrollDown = function(){
       .attr("y", 125)
       .text("Click for more")
       .on("click", scrollDown)
+
+//Permanent borough labels on map
+var defs = svg.append("defs");
+var filter = defs.append("filter")
+    .attr("id", "shadow")
+    .attr("x", "-20%")
+    .attr("y", "-19%")
+    .attr("height", "180%")
+    .attr("width", "180%")
+
+filter.append("feGaussianBlur")
+    .attr("stdDeviation", "2 2")
+    .attr("result", "shadow");
+ 
+filter.append("feOffset")
+    .attr("dx", 2)
+    .attr("dy", 2)
+ 
+// overlay original SourceGraphic over translated blurred opacity by using
+// feMerge filter. Order of specifying inputs is important!
+// var feMerge = filter.append("feMerge");
+// feMerge.append("feMergeNode")
+//     .attr("in", "offsetBlur")
+// feMerge.append("feMergeNode")
+//     .attr("in", "SourceGraphic");
+
+
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.26)
+      .attr("y", mapHeight*0.24)
+      .style("filter", "url(#shadow)")
+      .text("MANHATTAN")
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.26)
+      .attr("y", mapHeight*0.24)
+      .text("MANHATTAN")
+
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.395)
+      .attr("y", mapHeight*0.095)
+      .style("filter", "url(#shadow)")
+      .text("THE BRONX")      
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.395)
+      .attr("y", mapHeight*0.095)
+      .text("THE BRONX")
+
+
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.458)
+      .attr("y", mapHeight*0.27)
+      .style("filter", "url(#shadow)")
+      .text("QUEENS")      
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.458)
+      .attr("y", mapHeight*0.27)
+      .text("QUEENS")
+
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.11)
+      .attr("y", mapHeight*0.45)
+      .style("filter", "url(#shadow)")
+      .text("STATEN")      
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.11)
+      .attr("y", mapHeight*0.45)
+      .text("STATEN")
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", 3+mapWidth*0.11)
+      .attr("y", 20+mapHeight*0.45)
+      .style("filter", "url(#shadow)")
+      .text("ISLAND")
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", 3+mapWidth*0.11)
+      .attr("y", 20+mapHeight*0.45)
+      .text("ISLAND")
+
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.30)
+      .attr("y", mapHeight*0.38)
+      .style("filter", "url(#shadow)")
+      .text("BROOKLYN")
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.30)
+      .attr("y", mapHeight*0.38)
+      .text("BROOKLYN")
   })
 
 
@@ -794,7 +902,10 @@ var scrollDown = function(){
 
       var row = (variable === "unbanked" || variable == "underbanked") ? "topRow" : "bottomRow"
       var formatter = (variable === "income") ? d3.format("$s") : d3.format("%");
-      var scatterMax = (variable === "income") ? SCATTER_MAX_DOLLARS : SCATTER_MAX_PERCENT;
+      var scatterMax;
+      if(variable === "income"){ scatterMax = SCATTER_MAX_DOLLARS}
+      else if(variable === "prepaid" || variable === "unemployment"){scatterMax = SCATTER_MAX_PREPAID}
+      else{ scatterMax = SCATTER_MAX_PERCENT}
 
       var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "prepaid": "Percent Prepaid"};
 
