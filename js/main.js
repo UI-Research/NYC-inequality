@@ -11,11 +11,11 @@ var desktop = true;
 var layout = {"desktop": {
                 "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
                   "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
-                  "plotTitle": {"x": 8, "y": 25}
+                  "plotTitle": {"x": 15, "y": 35}
                 },
                 "bottomRow": { "left": 41.0, "bottom": 33.0, "right": 24.0, "top": 0.0, "internal":{"large": 26.0, "small":21.0},
                   "plot": {"left": 43.0, "bottom": 26.0, "right": 13.0, "top": 48.0},
-                  "plotTitle": {"x": 8, "y": 25}
+                  "plotTitle": {"x": 15, "y": 35}
                 },
               },
               "tablet": {},
