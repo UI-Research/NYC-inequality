@@ -729,6 +729,7 @@ var scrollDown = function(){
       .insert("div", "svg.map")
       .attr("class", "map legend")
       .style("position", "absolute")
+      .style("pointer-events", "none")
       .append("svg")
       .attr("width", mapWidth)
       .attr("height", mapHeight)
@@ -740,6 +741,7 @@ var scrollDown = function(){
       .attr("x", 7)
       .attr("y", 7)
       .style("fill", "#fff")
+
 
     svg.append("text")
       .attr("class", "legend title")
@@ -791,21 +793,21 @@ var scrollDown = function(){
       .on("click", scrollDown)
 
 //Permanent borough labels on map
-var defs = svg.append("defs");
-var filter = defs.append("filter")
-    .attr("id", "shadow")
-    .attr("x", "-20%")
-    .attr("y", "-19%")
-    .attr("height", "180%")
-    .attr("width", "180%")
+    var defs = svg.append("defs");
+    var filter = defs.append("filter")
+        .attr("id", "shadow")
+        .attr("x", "-20%")
+        .attr("y", "-19%")
+        .attr("height", "180%")
+        .attr("width", "180%")
 
-filter.append("feGaussianBlur")
-    .attr("stdDeviation", "2 2")
-    .attr("result", "shadow");
- 
-filter.append("feOffset")
-    .attr("dx", 2)
-    .attr("dy", 2)
+    filter.append("feGaussianBlur")
+        .attr("stdDeviation", "2 2")
+        .attr("result", "shadow");
+     
+    filter.append("feOffset")
+        .attr("dx", 2)
+        .attr("dy", 2)
  
 // overlay original SourceGraphic over translated blurred opacity by using
 // feMerge filter. Order of specifying inputs is important!
@@ -830,13 +832,13 @@ filter.append("feOffset")
 
     svg.append("text")
       .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.395)
+      .attr("x", mapWidth*0.37)
       .attr("y", mapHeight*0.095)
       .style("filter", "url(#shadow)")
       .text("THE BRONX")      
     svg.append("text")
       .attr("class", "map borough name")
-      .attr("x", mapWidth*0.395)
+      .attr("x", mapWidth*0.37)
       .attr("y", mapHeight*0.095)
       .text("THE BRONX")
 
@@ -887,6 +889,18 @@ filter.append("feOffset")
       .attr("x", mapWidth*0.30)
       .attr("y", mapHeight*0.38)
       .text("BROOKLYN")
+
+    svg.append("text")
+      .attr("class", "map state name")
+      .attr("x", mapWidth*0.58)
+      .attr("y", mapHeight*0.29)
+      .text("NEW YORK")
+    svg.append("text")
+      .attr("class", "map state name")
+      .attr("x", mapWidth*0.015)
+      .attr("y", mapHeight*0.3)
+      .text("NEW JERSEY")
+
   })
 
 

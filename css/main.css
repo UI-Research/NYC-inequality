@@ -172,9 +172,15 @@ svg.map{
 .map.borough.name{
 	fill: #ffffff;
 	font: 12pt HelveticaNeue-Bold;
+	letter-spacing: 2pt;
 }
 .shadow{
 	fill: #000000 !important;
+}
+.map.state.name{
+	fill: #cccccc;
+	font: 12pt HelveticaNeue;
+	letter-spacing: 3pt;
 }
 /************* MAP LEGEND STYLES ********************/
 .legend.title{
@@ -186,6 +192,7 @@ svg.map{
 .legend.key{
 	stroke: #ffffff;
 	stroke-width: 2px;
+	pointer-events: visible !important;
 }
 .legend.nyc.value{
 	font: 20pt HelveticaNeue-Bold;
@@ -193,6 +200,7 @@ svg.map{
 .legend.more{
 	font: 9pt HelveticaNeue-Italic;
 	font-style: italic;
+	pointer-events: visible !important;
 }
 /************* STYLES FROM ILLUSTRATOR ********************/
 
