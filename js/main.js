@@ -4,7 +4,7 @@ var SCATTER_MAX_PERCENT = 0.5;
 var SCATTER_MAX_PREPAID = 0.2;
 var SCATTER_MAX_DOLLARS = 150000;
 var SCATTER_TICKS = 5;
-var DOT_RADIUS = 8;
+var DOT_RADIUS = 5;
 
 var desktop = true;
 
