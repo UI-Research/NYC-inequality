@@ -85,6 +85,13 @@ var scrollDown = function(){
   var getColor = function(obj, context){
     return COLORS[getBuckets(BREAKS, obj[context])[1]-1]
   }
+  var checkClass = function(obj, context, suffix){
+    if (getBuckets(BREAKS, obj[context])[1] == suffix){
+      return true;
+    }else{
+      return false;
+    }
+  }
   var getBuckets = function(array, value) {
   var indexes = [],
       len = array.length,
@@ -626,6 +633,12 @@ var scrollDown = function(){
 
 
       d3.selectAll("rect.bar")
+              .classed("bucket_1", function(d){ console.log(checkClass(d, context, 1)); return checkClass(d, context, 1) }) 
+        .classed("bucket_2", function(d){ return checkClass(d, context, 2) })
+        .classed("bucket_3", function(d){ return checkClass(d, context, 3) }) 
+        .classed("bucket_4", function(d){ return checkClass(d, context, 4) }) 
+        .classed("bucket_5", function(d){ return checkClass(d, context, 5) }) 
+
         .attr("value", context)
         .transition()
         .duration(600)
@@ -633,6 +646,7 @@ var scrollDown = function(){
           return getColor(d,context)
         })
         .attr("width",function(d){ return width - x(d[context])})
+
 
     });
 
