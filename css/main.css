@@ -159,6 +159,14 @@ body{
 .scatter.connector{
 	stroke-width: 3pt;
 }
+
+/*Boroughs*/
+.temp.The_Bronx{ stroke: #cccccc;}
+.temp.Manhattan{ stroke: #999999;}
+.temp.Staten_Island{ stroke: #666666;}
+.temp.Brooklyn{ stroke: #333333;}
+.temp.Queens{ stroke: #000000;}
+
 /************* MAP STYLES ********************/
 svg.map{
 	width: 70%;

@@ -21,14 +21,12 @@ var layout = {"desktop": {
               "tablet": {},
               "mobile": {}
         };
-// var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "sortBars");
-
 
 function drawGraphic(containerWidth) {
 
-var scrollDown = function(){
-  window.parent.scrollFunc();
-}
+  var scrollDown = function(){
+    window.parent.scrollFunc();
+  }
 
 // wrap function modified from http://bl.ocks.org/mbostock/7555321
   var wrap = function(text, width) {
@@ -119,7 +117,7 @@ var scrollDown = function(){
   return -1;
 }
 
-  var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "sortBars", "bucketHighlight");
+  var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "sortBars", "bucketHighlight", "deselectEntities");
 
   d3.csv("../data/data.csv", function(error, pumas) {
     if (error) throw error;
@@ -148,8 +146,16 @@ var scrollDown = function(){
     dispatch.load(data);
   });
 
+  dispatch.on("deselectEntities", function(eventType){
+    d3.selectAll(".bar.selected").classed("selected", false);
+    d3.selectAll(".puma.selected").classed("selected", false);
 
+    var tooltip = d3.select(".bar.tooltip")
+    var y = tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/)[1]
+    tooltip.transition()
+      .attr("transform", "translate(2000," + y + ")")
 
+  });
 
   dispatch.on("load", function(data) {
     $(".header.row").empty();
@@ -158,6 +164,9 @@ var scrollDown = function(){
   });
 
   dispatch.on("load.menu", function(data) {
+    // dispatch.on("deselectEntities", function(eventType){
+      
+    // });
 
     (function( $ ) {
       $.widget( "custom.combobox", {
@@ -327,7 +336,7 @@ var scrollDown = function(){
 
     var key = wrapper.append("svg")
       .attr("width", topRowWidth * 0.64)
-      .attr("height", 40)
+      .attr("height", 160)
     
     var pumaKey = key.append("g")
               .attr("class", "puma");
@@ -337,6 +346,8 @@ var scrollDown = function(){
         boroughKey.append("text");
     var nycKey = key.append("g")
               .attr("class", "nyc");
+    var defaultKeys = key.append("g")
+              .attr("class", "temp");
 
     nycKey.append("line")
       .attr("class", "scatter nyc connector")
@@ -359,6 +370,35 @@ var scrollDown = function(){
       .attr("x", 85)
       .attr("y", 15)
       .text("NYC average");
+
+    defaultKeys
+      .attr("transform", "translate(0,12)")
+
+    for(var i = 2; i<7; i++){
+        var boroughData = data.get(i)
+        var className = boroughData.name.replace(" ","_")
+        defaultKeys.append("line")
+          .attr("class", "scatter connector temp " + className)
+          .attr("x1", 10)
+          .attr("x2", 65)
+          .attr("y1", 22*(i-1))
+          .attr("y2", 22*(i-1));     
+        defaultKeys.append('circle')
+          .attr("class","scatter dot key temp " + className)
+          .attr("cx", 10)
+          .attr("cy", 22*(i-1))
+          .attr("r", DOT_RADIUS);
+        defaultKeys.append('circle')
+          .attr("class","scatter dot key temp " + className)
+          .attr("cx", 65)
+          .attr("cy", 22*(i-1))
+          .attr("r", DOT_RADIUS);
+        defaultKeys.append("text")
+          .attr("class", "scatter key text temp " + className)
+          .attr("x", 85)
+          .attr("y", 5+22*(i-1))
+          .text(boroughData.name);
+    }
 
 
 //Top menu
@@ -388,13 +428,17 @@ var scrollDown = function(){
 //Bottom Menu
       title.text(puma.name);
 
-      key.transition()
-        .attr("height", 120);
+      key.attr("height", 120);
 
+      pumaKey.transition()
+        .attr("transform", "translate(0,0)");
       nycKey.transition()
         .attr("transform", "translate(0," + (60 + (lineCount-1)*15) +")");
       boroughKey.transition()
         .attr("transform", "translate(0," + (30 + (lineCount-1)*15) +")");
+      defaultKeys.transition()
+        .duration(800)
+        .attr("transform", "translate(0,300)");
 
       boroughKey.selectAll(".scatter").remove();
       boroughKey.append("line")
@@ -458,6 +502,20 @@ var scrollDown = function(){
           });
       }
     });
+
+    dispatch.on("deselectEntities.menu", function(eventType){
+      key.attr("height", 160);
+      title.text("New York City Average")
+
+      nycKey.transition()
+        .attr("transform", "translate(0,0)");
+      pumaKey.transition()
+        .attr("transform", "translate(0,300)");
+      boroughKey.transition()
+        .attr("transform", "translate(0,300)");
+      defaultKeys.transition()
+      .attr("transform", "translate(0,12)");
+    })
   });
 
   dispatch.on("load.buttons", function(data){
@@ -564,7 +622,7 @@ var scrollDown = function(){
         .attr("x", 0)
         .attr("width", function(d) { return width - x(d.unbanked2013); })
         .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); })
-        // .on("mouseout", function(){ d3.selectAll(".selected").classed("selected", false) })
+        .on("mouseout", function(d) { dispatch.deselectEntities("mouseout"); })
 
     var tooltip = svg.append("g")
       .attr("class", "bar tooltip")
@@ -614,7 +672,7 @@ var scrollDown = function(){
       values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a[context] - b[context]}).reverse()
       var unsorted = data.values().filter(function(d){ return d.isPuma})
 
-      if(d3.selectAll('.bar.tooltip .name').node()){
+      if(d3.selectAll('.bar.tooltip .name').node() && d3.selectAll('.bar.selected').node() != null){
         d3.selectAll('.bar.tooltip')  
           .transition()
           .duration(600)
@@ -661,16 +719,17 @@ var scrollDown = function(){
       y = d3.scale.ordinal()
         .rangeRoundBands([0, height], .1)
         .domain(values.map(function(d) { return d.name; }));
-      // console.log(d3.selectAll(".bar.tooltip"))
-      d3.selectAll('.bar.tooltip')
-        .transition()
-        .ease("back")
-        .delay(300)
-        .duration(400)
-        .attr("transform", function(d) { if(typeof(d) != "undefined") {
-          return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")"
-        } else { return null}
-        })
+      if(d3.selectAll('.bar.tooltip .name').node() && d3.selectAll('.bar.selected').node() != null){
+        d3.selectAll('.bar.tooltip')
+          .transition()
+          .ease("back")
+          .delay(300)
+          .duration(400)
+          .attr("transform", function(d) { if(typeof(d) != "undefined") {
+            return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")"
+          } else { return null}
+          })
+      }
 
       svg.selectAll("rect.bar")
       .sort(function(a,b){return a[context] - b[context]})
@@ -708,7 +767,7 @@ var scrollDown = function(){
       .datum(d)
       .style("fill", getColor(d, "unbanked2013"))
       .on("mouseover",function(d){ dispatch.selectEntity(data.get(d.id)) })
-      // .on("mouseout", function(){ d3.selectAll(".selected").classed("selected", false) })
+      .on("mouseout", function(d) { dispatch.deselectEntities("mouseout"); })
     });
 
     dispatch.on("changeContext.map", function(type,year){
@@ -814,15 +873,6 @@ var scrollDown = function(){
         .attr("dx", 2)
         .attr("dy", 2)
  
-// overlay original SourceGraphic over translated blurred opacity by using
-// feMerge filter. Order of specifying inputs is important!
-// var feMerge = filter.append("feMerge");
-// feMerge.append("feMergeNode")
-//     .attr("in", "offsetBlur")
-// feMerge.append("feMergeNode")
-//     .attr("in", "SourceGraphic");
-
-
     svg.append("text")
       .attr("class", "map borough name shadow")
       .attr("x", mapWidth*0.26)
@@ -913,7 +963,7 @@ var scrollDown = function(){
   dispatch.on("load.scatter", function(data){
     var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
     var bottomRowWidth = (containerWidth - layout.desktop.bottomRow.left - layout.desktop.bottomRow.right - layout.desktop.bottomRow.internal.large - layout.desktop.bottomRow.internal.small*3.0) * 0.25;
-
+    
     var drawScatter = function(variable){
       var containerID = variable + "Plot"
       var width = (variable === "unbanked" || variable == "underbanked") ? topRowWidth : bottomRowWidth;
@@ -992,7 +1042,7 @@ var scrollDown = function(){
         .call(yAxis)
       var nycData = data.get(1)
 
-      for(var i = 2; i<6; i++){
+      for(var i = 2; i<7; i++){
         var boroughData = data.get(i)
         var className = boroughData.name.replace(" ","_")
         svg.append("line")
@@ -1121,6 +1171,59 @@ var scrollDown = function(){
     drawScatter("prepaid")
     pymChild.sendHeight()
 
+    dispatch.on("deselectEntities.scatter", function(eventType){
+        var returnDefaults = function(variable){
+        var width = (variable === "unbanked" || variable == "underbanked") ? topRowWidth : bottomRowWidth;
+        var height = width;
+        var row = (variable === "unbanked" || variable == "underbanked") ? "topRow" : "bottomRow"
+        var scatterMax = (variable === "income") ? SCATTER_MAX_DOLLARS : SCATTER_MAX_PERCENT;
+        var y = d3.scale.linear()
+              .domain([0, scatterMax])
+              .range([ height - layout.desktop[row].plot.bottom, layout.desktop[row].plot.top]);
+        var svg = d3.select("svg." +  variable)
+
+        for(var i = 2; i<7; i++){
+          var boroughData = data.get(i)
+          var className = boroughData.name.replace(" ","_")
+          svg.select(".scatter.connector.temp." + className)
+            .transition()
+            .attr("y1", y(boroughData[variable + "2011"]))
+            .attr("y2", y(boroughData[variable + "2013"]))
+          svg.select(".scatter.dot.y2011.temp." + className)
+            .transition()
+            .attr("cy", y(boroughData[variable + "2011"]))
+          svg.select(".scatter.nyc.dot.y2013.temp." + className)
+            .transition()
+            .attr("cy", y(boroughData[variable + "2013"]))
+        }
+
+        svg.selectAll(".scatter.puma.dot")
+          .transition()
+          .attr("cy", 600);
+        svg.selectAll(".scatter.puma.connector")
+          .transition()
+          .attr("y1", 600)
+          .attr("y2", 600);
+
+        svg.selectAll(".scatter.borough.dot")
+          .transition()
+          .attr("cy", 600);
+        svg.selectAll(".scatter.borough.connector")
+          .transition()
+          .attr("y1", 600)
+          .attr("y2", 600);
+
+
+      }
+      returnDefaults("unbanked")
+      returnDefaults("underbanked")
+      returnDefaults("poverty")
+      returnDefaults("income")
+      returnDefaults("unemployment")
+      returnDefaults("prepaid")
+      pymChild.sendHeight()
+    })
+
     dispatch.on("selectEntity.scatter", function(d){
       var updateScatter = function(variable){
         var BOROUGHS = {"Bronx": 2, "Manhattan": 3, "Staten": 4, "Brooklyn": 5, "Queens": 6}
@@ -1137,12 +1240,12 @@ var scrollDown = function(){
         svg.selectAll("circle.temp")
           .transition()
           .duration(800)
-          .attr("cy", 400)
+          .attr("cy", 600)
         svg.selectAll("line.temp")
           .transition()
           .duration(800)
-          .attr("y1", 400)
-          .attr("y2", 400)
+          .attr("y1", 600)
+          .attr("y2", 600)
 
         svg.select(".scatter.puma.dot.y2011")
           .transition()
