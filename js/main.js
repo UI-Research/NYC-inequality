@@ -7,18 +7,18 @@ var SCATTER_TOOLTIP_WIDTH = 250;
 var SCATTER_TOOLTIP_HEIGHT_SMALL = 120;
 var SCATTER_TOOLTIP_HEIGHT_LARGE = 200;
 var SCATTER_TICKS = 5;
-var DOT_RADIUS = 8;
+var DOT_RADIUS = 5;
 var BOROUGHS = {"Bronx": 2, "Manhattan": 3, "Staten": 4, "Brooklyn": 5, "Queens": 6};
 
 var desktop = true;
 var layout = {"desktop": {
                 "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
                   "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
-                  "plotTitle": {"x": 8, "y": 25}
+                  "plotTitle": {"x": 15, "y": 35}
                 },
                 "bottomRow": { "left": 41.0, "bottom": 33.0, "right": 24.0, "top": 0.0, "internal":{"large": 26.0, "small":21.0},
                   "plot": {"left": 55.0, "bottom": 26.0, "right": 13.0, "top": 48.0},
-                  "plotTitle": {"x": 8, "y": 25}
+                  "plotTitle": {"x": 15, "y": 35}
                 },
               },
               "tablet": {},
