@@ -208,7 +208,7 @@ function drawGraphic(containerWidth) {
               this._trigger( "select", event, {
                 item: ui.item.option
               });
-              dispatch.selectEntity(data.get(ui.item.option.value))
+              dispatch.clickEntity(data.get(ui.item.option.value))
             },
    
             autocompletechange: "_removeIfInvalid"
