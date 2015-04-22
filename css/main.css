@@ -129,7 +129,6 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 .scatter.axis.x line, .scatter.axis.x path {
-    shape-rendering: crispEdges;
     stroke: black;
     fill: none;
 }
@@ -175,6 +174,41 @@ button.selected, .puma.selected, .bar.selected{
 .temp.Staten_Island{ stroke: #666666;}
 .temp.Brooklyn{ stroke: #333333;}
 .temp.Queens{ stroke: #000000;}
+
+/*Tooltip*/
+.scatter.tooltip{
+	background: rgba(255,255,255,.85);
+	position: fixed;
+	pointer-events: none;
+    -webkit-filter: drop-shadow(4px 4px 6px #ccc);
+    -moz-filter: drop-shadow(4px 4px 6px #ccc);
+    filter: drop-shadow(4px 4px 6px #ccc);
+
+
+}
+
+.scatter.tooltip:after {
+	top: 100%;
+	left: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+	border-color: rgba(255, 255, 255, 0);
+	border-top-color: rgba(255,255,255,.85);
+	border-width: 10px;
+	margin-left: -10px;
+}
+
+.tooltip.text{
+	margin: 10px 0px 0px 10px;
+	display: inline-block;
+}
+.tooltip.text.emphasis{
+	font: 12pt HelveticaNeue-Bold;
+}
 
 /************* MAP STYLES ********************/
 svg.map{
