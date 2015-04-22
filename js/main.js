@@ -4,15 +4,13 @@ var SCATTER_MAX_PERCENT = 0.5;
 var SCATTER_MAX_PREPAID = 0.2;
 var SCATTER_MAX_DOLLARS = 150000;
 var SCATTER_TOOLTIP_WIDTH = 250;
-var SCATTER_TOOLTIP_HEIGHT_SMALL = 100;
+var SCATTER_TOOLTIP_HEIGHT_SMALL = 120;
 var SCATTER_TOOLTIP_HEIGHT_LARGE = 200;
 var SCATTER_TICKS = 5;
 var DOT_RADIUS = 8;
 var BOROUGHS = {"Bronx": 2, "Manhattan": 3, "Staten": 4, "Brooklyn": 5, "Queens": 6};
 
-
 var desktop = true;
-
 var layout = {"desktop": {
                 "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
                   "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
@@ -26,13 +24,10 @@ var layout = {"desktop": {
               "tablet": {},
               "mobile": {}
         };
-
 function drawGraphic(containerWidth) {
-
   var scrollDown = function(){
     window.parent.scrollFunc();
   }
-
 // wrap function modified from http://bl.ocks.org/mbostock/7555321
   var wrap = function(text, width) {
     text.each(function() {
@@ -58,7 +53,6 @@ function drawGraphic(containerWidth) {
       }
     });
   }
-
   var formatBorough = function(borough){
     if (borough == "Staten"){ return "Staten Island";}
     else if (borough == "Bronx"){ return "The Bronx";}
@@ -88,7 +82,6 @@ function drawGraphic(containerWidth) {
                     .replace(' ','');
     return (typeName.trim() + yearName.trim());
   }
-
   var getColor = function(obj, context){
     return COLORS[getBuckets(BREAKS, obj[context])[1]-1]
   }
@@ -104,26 +97,20 @@ function drawGraphic(containerWidth) {
       len = array.length,
       i,
       index = array.indexOf(value);
-
   if (~index) {
     return index;
   }
-
   if (value < array[0]) {
     return -1;  
   }
-
   for (i = 1; i < len; i++) {
     if (array[i] >= value) {
       return [i - 1, i];
     }    
   }
-
   return -1;
 }
-
   var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "clickEntity", "sortBars", "bucketHighlight", "deselectEntities", "scatterTooltip");
-
   d3.csv("../data/data.csv", function(error, pumas) {
     if (error) throw error;
     var data = d3.map();
@@ -150,7 +137,6 @@ function drawGraphic(containerWidth) {
     });
     dispatch.load(data);
   });
-
   dispatch.on("deselectEntities", function(eventType){
     d3.selectAll(".bar.selected").classed("selected", false);
     var clicked = d3.select(".bar.clicked")
@@ -165,18 +151,15 @@ function drawGraphic(containerWidth) {
       dispatch.selectEntity(clickedPuma.data()[0])
     }
   });
-
   dispatch.on("load", function(data) {
     $(".header.row").empty();
     $(".scatter.row").empty();
     $(".barContainer").empty();
   });
-
   dispatch.on("load.menu", function(data) {
     // dispatch.on("deselectEntities", function(eventType){
       
     // });
-
     (function( $ ) {
       $.widget( "custom.combobox", {
         _create: function() {
@@ -306,15 +289,12 @@ function drawGraphic(containerWidth) {
         }
       });
     }) (jQuery)
-
     var values = data.values().filter(function(d){ return d.isPuma}).sort(
           function(a, b) {
             var textA = a.name.toUpperCase();
             var textB = b.name.toUpperCase();
             return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
           });
-
-
 //Bottom menu
     var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
     var row = d3.select(".scatter.row")
@@ -323,27 +303,22 @@ function drawGraphic(containerWidth) {
       .style("height", topRowWidth + "px")
       .style("width", (topRowWidth * 0.64) + "px")
       .style("margin", layout.desktop.topRow.top + "px " + 0 + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.left + "px ")
-
     var title = wrapper.append("div")
       .attr("class", "title")
       .text("New York City Average")
-
     wrapper.append("div")
       .attr("class", "helpText")
       .text("Select another neighborhood");
-
     var bottomSelect = wrapper.append("div")
       .classed("ui-widget", true)
       .append("select")
       .attr("id", "bottomCombobox")
       .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
-
     bottomSelect.selectAll("option")
       .data(values)
       .enter().append("option")
       .attr("value", function(d) { return d.id; })
       .text(function(d) { return d.name; });
-
     var key = wrapper.append("svg")
       .attr("width", topRowWidth * 0.64)
       .attr("height", 160)
@@ -357,7 +332,6 @@ function drawGraphic(containerWidth) {
               .attr("class", "nyc");
     var defaultKeys = key.append("g")
               .attr("class", "temp");
-
     nycKey.append("line")
       .attr("class", "scatter nyc connector")
       .attr("x1", 10)
@@ -379,7 +353,6 @@ function drawGraphic(containerWidth) {
       .attr("x", 85)
       .attr("y", 15)
       .text("NYC average");
-
     boroughKey.append("line")
         .attr("class", "scatter borough connector")
         .attr("x1", 10)
@@ -402,7 +375,6 @@ function drawGraphic(containerWidth) {
         .attr("x", 85)
         .attr("y", 300)
         .text("");
-
       pumaKey.append("line")
         .attr("class", "scatter puma connector")
         .attr("x1", 10)
@@ -420,10 +392,8 @@ function drawGraphic(containerWidth) {
         .attr("cx", 65)
         .attr("cy", 300)
         .attr("r", DOT_RADIUS);
-
     defaultKeys
       .attr("transform", "translate(0,12)")
-
     for(var i = 2; i<7; i++){
         var boroughData = data.get(i)
         var className = boroughData.name.replace(" ","_")
@@ -450,7 +420,6 @@ function drawGraphic(containerWidth) {
           .text(boroughData.name);
     }
 
-
 //Top menu
     var select = d3.select(".header.row")
       .append("div")
@@ -469,7 +438,6 @@ function drawGraphic(containerWidth) {
       $( "#combobox" ).combobox();
       $( "#bottomCombobox" ).combobox();
     }); 
-
     dispatch.on("selectEntity.menu", function(puma) {
       var lines = puma.name.split("/");
       var lineCount = lines.length;
@@ -477,9 +445,7 @@ function drawGraphic(containerWidth) {
       select.property("value", puma.id);
 //Bottom Menu
       title.text(puma.name);
-
       key.attr("height", 120);
-
       pumaKey.transition()
         .attr("transform", "translate(0,0)");
       nycKey.transition()
@@ -489,7 +455,6 @@ function drawGraphic(containerWidth) {
       defaultKeys.transition()
         .duration(800)
         .attr("transform", "translate(0,300)");
-
         boroughKey.select(".connector")
         .transition()
         .attr("y1", 10)
@@ -522,12 +487,10 @@ function drawGraphic(containerWidth) {
           });
       }
     });
-
     dispatch.on("deselectEntities.menu", function(eventType){
       if(d3.selectAll(".bar.clicked").node() == null){
         key.attr("height", 160);
         title.text("New York City Average")
-
         nycKey.transition()
           .attr("transform", "translate(0,0)");
         pumaKey.transition()
@@ -539,7 +502,6 @@ function drawGraphic(containerWidth) {
       }
     })
   });
-
   dispatch.on("load.buttons", function(data){
     var row = d3.select(".header.row")
     row.append("button")
@@ -558,19 +520,16 @@ function drawGraphic(containerWidth) {
       .attr("class", "y2013 button year selected")
       .text("2013")
       .on("click", function(){ dispatch.changeContext(d3.select(".button.type.selected").node(), this)});
-
     row.append("button")
       .attr("class", "sort button")
       .text("Sort bars")
       .on("click", function(){ dispatch.sortBars(d3.select(".button.type.selected").node(), d3.select(".button.year.selected").node())});
   })
-
   dispatch.on("changeContext", function(type, year){
     d3.selectAll(".button.selected").classed("selected",false)
     d3.select(type).classed("selected", true)
     d3.select(year).classed("selected", true)
   })
-
   dispatch.on("load.bar", function(data) {
     var formatter = d3.format(".1%")
     var barAspectHeight = 15; 
@@ -578,7 +537,6 @@ function drawGraphic(containerWidth) {
     var margin = {top: 0, right: 20, bottom: 35, left: 18},
         width = containerWidth*.3 - margin.left - margin.right,
         height = Math.ceil((width * barAspectHeight) / barAspectWidth) - margin.top - margin.bottom;
-
     var values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).reverse()
     var x = d3.scale.linear()
         .domain([0, d3.max(values, function(d) {
@@ -586,29 +544,23 @@ function drawGraphic(containerWidth) {
          })])
         .rangeRound([width, 0])
         .nice();
-
     var y = d3.scale.ordinal()
       .rangeRoundBands([0, height], .1)
       .domain(values.map(function(d) { return d.name; }));
-
     var yAxis = d3.svg.axis()
         .scale(y)
-
     var xAxis = d3.svg.axis()
         .scale(x)
-
     var svg = d3.select(".barContainer").append("svg")
         .attr("class", "bars")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
     svg.append("g")
         .attr("class", "bar x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis);
-
     svg.append("g")
         .attr("class", "bar y axis")
         .call(yAxis)
@@ -620,17 +572,14 @@ function drawGraphic(containerWidth) {
       .attr("x2", width - x(nycData.unbanked2013))
       .attr("y1", 0)
       .attr("y2", height)
-
     svg.append("polygon")
       .attr("class", "nycArrow")
       .attr("points", (width - x(nycData.unbanked2013)) + "," + height*.9 + " " + (width - x(nycData.unbanked2013) + 12) + "," + (height*.9-4) + " " + (width - x(nycData.unbanked2013) + 12) + "," + (height*.9+4))
-
     svg.append("text")
       .attr("class","nycText")
       .attr("y", height*.907)
       .attr("x", (width - x(nycData.unbanked2013) + 15))
       .text("NYC, " + formatter(nycData.unbanked2013))
-
 
     svg.selectAll("rect.bar")
         .data(values)
@@ -646,14 +595,11 @@ function drawGraphic(containerWidth) {
         .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); })
         .on("click", function(d){ dispatch.clickEntity(data.get(d.id)); dispatch.selectEntity(data.get(d.id))})
         .on("mouseout", function(d) { dispatch.deselectEntities("mouseout"); })
-
     var tooltip = svg.append("g")
       .attr("class", "bar tooltip")
       
-
     tooltip.append("text")
       .attr("class", "value")
-
     dispatch.on("clickEntity.bar", function(d){
       scrollDown();
       var clicked = d3.select(".bar.fips_" + d.id)
@@ -662,21 +608,17 @@ function drawGraphic(containerWidth) {
       clicked.classed("selected", !isClicked)
       clicked.classed("clicked", !isClicked)
     });
-
     dispatch.on("selectEntity.bar", function(d) {
       d3.selectAll(".bar").classed("selected",false)
       var selected = d3.select(".bar.fips_" + d.id).classed("selected",true)
       var context = selected.attr("value")
-
       tooltip
         .datum(d)
         .transition()
         .duration(200)
         .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
-
       d3.selectAll(".tooltip .name").remove()
       d3.selectAll(".tooltip .background").remove()
-
       var names = d.name.split("/")
       for(var i=0; i<names.length; i++){
         var lineEnd = (i+1 == names.length) ? "":" /";
@@ -687,7 +629,6 @@ function drawGraphic(containerWidth) {
       }
       tooltip.select(".value")
         .text(formatter(d[context]))
-
       var bbox = tooltip.node().getBBox();
       tooltip.insert("rect", ".value")
         .attr("class","background")
@@ -696,7 +637,6 @@ function drawGraphic(containerWidth) {
         .attr("width",bbox.width + 10)
         .attr("height",bbox.height + 10)
     });
-
     dispatch.on("deselectEntities.bars", function(eventType){
       var tooltip = d3.select(".bar.tooltip")
       if(d3.selectAll(".bar.clicked").node() == null){
@@ -714,19 +654,16 @@ function drawGraphic(containerWidth) {
           .attr("transform", "translate(" + tooltipX + "," + (parseFloat(tooltipY)+12.0) + ")")
       }
     })
-
     dispatch.on("changeContext.bar", function(type, year) {
       var context = getContext(type, year);
       values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a[context] - b[context]}).reverse()
       var unsorted = data.values().filter(function(d){ return d.isPuma})
-
       if(d3.selectAll('.bar.tooltip .name').node() && d3.selectAll('.bar.selected').node() != null){
         d3.selectAll('.bar.tooltip')  
           .transition()
           .duration(600)
           .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
       }
-
       d3.select(".nycDashedLine")
         .transition()
         .duration(400)
@@ -742,14 +679,12 @@ function drawGraphic(containerWidth) {
         .attr("x", (width - x(nycData[context]) + 15))
         .text("NYC, " + formatter(nycData[context]))
 
-
       d3.selectAll("rect.bar")
         .classed("bucket_1", function(d){ return checkClass(d, context, 1) }) 
         .classed("bucket_2", function(d){ return checkClass(d, context, 2) })
         .classed("bucket_3", function(d){ return checkClass(d, context, 3) }) 
         .classed("bucket_4", function(d){ return checkClass(d, context, 4) }) 
         .classed("bucket_5", function(d){ return checkClass(d, context, 5) }) 
-
         .attr("value", context)
         .transition()
         .duration(600)
@@ -758,12 +693,9 @@ function drawGraphic(containerWidth) {
         })
         .attr("width",function(d){ return width - x(d[context])})
 
-
     });
-
     dispatch.on("sortBars.bar", function(type,year){
       var context = getContext(type, year);
-
       y = d3.scale.ordinal()
         .rangeRoundBands([0, height], .1)
         .domain(values.map(function(d) { return d.name; }));
@@ -778,7 +710,6 @@ function drawGraphic(containerWidth) {
           } else { return null}
           })
       }
-
       svg.selectAll("rect.bar")
       .sort(function(a,b){return a[context] - b[context]})
         .transition()
@@ -788,7 +719,6 @@ function drawGraphic(containerWidth) {
         .duration(500)
         .attr("y",function(d) {return y(d.name); })
     });
-
     dispatch.on("bucketHighlight.bar", function(bucket){
       d3.selectAll(".bar").classed("deemphasized", true)
       d3.selectAll("path.puma").classed("deemphasized", true)
@@ -798,16 +728,13 @@ function drawGraphic(containerWidth) {
         var fipsClass = d3.select(this).attr("class").match(/\sfips_\d*\s/g)[0].trim()
         d3.select("path.puma."+fipsClass).classed("deemphasized", false)
       })
-
       bars.classed("deemphasized", false)
     });
   });
-
   dispatch.on("selectEntity.puma", function(d) {
     d3.selectAll(".puma").classed("selected",false)
     d3.select(".puma.fips_" + d.id).classed("selected",true)
   });
-
   dispatch.on("clickEntity.puma", function(d){
       scrollDown();
       var clicked = d3.select(".puma.fips_" + d.id)
@@ -816,7 +743,6 @@ function drawGraphic(containerWidth) {
       clicked.classed("selected", !isClicked)
       clicked.classed("clicked", !isClicked)
   });
-
   dispatch.on("load.map", function(data) {
     var values = data.values().sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).filter(function(d){ return d.isPuma}).reverse()
     values.forEach(function(d){
@@ -827,7 +753,6 @@ function drawGraphic(containerWidth) {
       .on("mouseout", function(d) { dispatch.deselectEntities("mouseout"); })
       .on("click", function(d){ dispatch.clickEntity(data.get(d.id)); dispatch.selectEntity(data.get(d.id))})
     });
-
     dispatch.on("changeContext.map", function(type,year){
       var context = getContext(type, year);
       var sorted = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a[context] - b[context]}).reverse()
@@ -840,13 +765,10 @@ function drawGraphic(containerWidth) {
       });  
     });
   });
-
   dispatch.on("load.key", function(data){
     var mapWidth = (desktop) ? containerWidth : containerWidth+1
     var mapHeight = containerWidth
-
     d3.select(".map.legend").remove();
-
     var svg = d3.select(".map.row")
       .insert("div", "svg.map")
       .attr("class", "map legend")
@@ -856,7 +778,6 @@ function drawGraphic(containerWidth) {
       .attr("width", mapWidth)
       .attr("height", mapHeight)
 
-
     svg.append("rect")
       .attr("width", 235)
       .attr("height", 144)
@@ -864,19 +785,16 @@ function drawGraphic(containerWidth) {
       .attr("y", 7)
       .style("fill", "#fff")
 
-
     svg.append("text")
       .attr("class", "legend title")
       .attr("x", 16)
       .attr("y", 29)
       .text("Percent Unbanked, 2013")
-
     svg.append("text")
         .attr("class", "legend label")
         .attr("x", 12)
         .attr("y", 75)
         .text("0%")
-
     for(var i = 0; i < 5; i++){
       svg.append("rect")
         .attr("class", "legend key bucket_" + (i+1))
@@ -886,7 +804,6 @@ function drawGraphic(containerWidth) {
         .attr("height", 21)
         .on("mouseover", function(){ dispatch.bucketHighlight( d3.select(this).attr("class").replace("legend","").replace("key","").trim() ) })
         .on("mouseout", function(){ d3.selectAll(".deemphasized").classed("deemphasized", false)})
-
       svg.append("text")
         .attr("class", "legend label")
         .attr("x", -3 + ((i+1)*43))
@@ -900,7 +817,6 @@ function drawGraphic(containerWidth) {
       .attr("dy",0)
       .text("New York City Average")
       .call(wrap, 130)
-
     var formatter = d3.format("%")
     svg.append("text")
       .attr("class","legend nyc value")
@@ -913,7 +829,6 @@ function drawGraphic(containerWidth) {
       .attr("y", 125)
       .text("Click for more")
       .on("click", scrollDown)
-
 //Permanent borough labels on map
     var defs = svg.append("defs");
     var filter = defs.append("filter")
@@ -922,7 +837,6 @@ function drawGraphic(containerWidth) {
         .attr("y", "-19%")
         .attr("height", "180%")
         .attr("width", "180%")
-
     filter.append("feGaussianBlur")
         .attr("stdDeviation", "2 2")
         .attr("result", "shadow");
@@ -942,7 +856,6 @@ function drawGraphic(containerWidth) {
       .attr("x", mapWidth*0.26)
       .attr("y", mapHeight*0.24)
       .text("MANHATTAN")
-
     svg.append("text")
       .attr("class", "map borough name shadow")
       .attr("x", mapWidth*0.37)
@@ -955,7 +868,6 @@ function drawGraphic(containerWidth) {
       .attr("y", mapHeight*0.095)
       .text("THE BRONX")
 
-
     svg.append("text")
       .attr("class", "map borough name shadow")
       .attr("x", mapWidth*0.458)
@@ -967,7 +879,6 @@ function drawGraphic(containerWidth) {
       .attr("x", mapWidth*0.458)
       .attr("y", mapHeight*0.27)
       .text("QUEENS")
-
     svg.append("text")
       .attr("class", "map borough name shadow")
       .attr("x", mapWidth*0.11)
@@ -990,7 +901,6 @@ function drawGraphic(containerWidth) {
       .attr("x", 3+mapWidth*0.11)
       .attr("y", 20+mapHeight*0.45)
       .text("ISLAND")
-
     svg.append("text")
       .attr("class", "map borough name shadow")
       .attr("x", mapWidth*0.30)
@@ -1002,7 +912,6 @@ function drawGraphic(containerWidth) {
       .attr("x", mapWidth*0.30)
       .attr("y", mapHeight*0.38)
       .text("BROOKLYN")
-
     svg.append("text")
       .attr("class", "map state name")
       .attr("x", mapWidth*0.58)
@@ -1013,7 +922,6 @@ function drawGraphic(containerWidth) {
       .attr("x", mapWidth*0.015)
       .attr("y", mapHeight*0.3)
       .text("NEW JERSEY")
-
     dispatch.on("selectEntity.key", function(puma){
       d3.selectAll(".key.selected").classed("selected", false)
       pumaName
@@ -1030,13 +938,11 @@ function drawGraphic(containerWidth) {
       key.classed("selected", true)
       key.node().parentNode.appendChild(key.node())
     });
-
     dispatch.on("changeContext.key", function(type, year){
       var context = getContext(type, year)
       var legendTitle = d3.select(".map.legend .legend.title")
       legendTitle.text("Percent " + context.split("2")[0].replace(/^u/,"U") + ", 2" + context.split("2")[1])
     })
-
     dispatch.on("deselectEntities.key", function(eventType){
       if(d3.selectAll(".bar.clicked").node() == null){
         pumaName
@@ -1053,9 +959,7 @@ function drawGraphic(containerWidth) {
           .classed("selected", false)
       }
     })
-
   })
-
   dispatch.on("load.scatter", function(data){
     var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
     var bottomRowWidth = (containerWidth - layout.desktop.bottomRow.left - layout.desktop.bottomRow.right - layout.desktop.bottomRow.internal.large - layout.desktop.bottomRow.internal.small*3.0) * 0.25;
@@ -1064,22 +968,18 @@ function drawGraphic(containerWidth) {
       var containerID = variable + "Plot"
       var width = (variable === "unbanked" || variable == "underbanked") ? topRowWidth : bottomRowWidth;
       var height = width;
-
       var row = (variable === "unbanked" || variable == "underbanked") ? "topRow" : "bottomRow"
       var formatter = (variable === "income") ? d3.format("$s") : d3.format("%");
       var scatterMax;
       if(variable === "income"){ scatterMax = SCATTER_MAX_DOLLARS}
       else if(variable === "prepaid" || variable === "unemployment"){scatterMax = SCATTER_MAX_PREPAID}
       else{ scatterMax = SCATTER_MAX_PERCENT}
-
       var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "prepaid": "Percent Prepaid"};
-
       var svg = d3.select("#" + containerID)
         .append("svg")
         .attr("class", variable)
         .attr("width", width)
         .attr("height", height)
-
       svg
         .append("g")
         .append("rect")
@@ -1088,27 +988,22 @@ function drawGraphic(containerWidth) {
         .attr("width",width)
         .attr("height", height)
         .attr("class","plot background")
-
       svg.append("text")
         .text(titles[variable])
         .attr("class","scatter title")
         .attr("x",layout.desktop[row].plotTitle.x)
         .attr("y",layout.desktop[row].plotTitle.y)
-
       var x = d3.scale.linear()
               .domain([2010.5, 2013.5])
               .range([ layout.desktop[row].plot.left , width - layout.desktop[row].plot.right])
-
       var y = d3.scale.linear()
             .domain([0, scatterMax])
             .range([ height - layout.desktop[row].plot.bottom, layout.desktop[row].plot.top]);
-
       var yAxis = d3.svg.axis()
         .scale(y)
         .orient("left")
         .ticks(SCATTER_TICKS)
         .tickFormat(formatter);
-
       y.ticks(SCATTER_TICKS).forEach(function(d){
       svg.append("line")
         .attr("class", "gridLine")
@@ -1137,18 +1032,15 @@ function drawGraphic(containerWidth) {
         .tickSize(5,5,0)
         .tickFormat(d3.format("0"));
 
-
       svg.append("g")
         .attr("class", "scatter x axis")
         .attr("transform", "translate(0," + (height - layout.desktop[row].plot.bottom) + ")")
         .call(xAxis);
-
       svg.append("g")
         .attr("class", "scatter y axis")
         .attr("transform", "translate(" + layout.desktop[row].plot.left + ",0)")
         .call(yAxis)
       var nycData = data.get(1)
-
       for(var i = 2; i<7; i++){
         var boroughData = data.get(i)
         var className = boroughData.name.replace(" ","_")
@@ -1175,7 +1067,6 @@ function drawGraphic(containerWidth) {
           .attr("cy", y(boroughData[variable + "2013"]))
           .attr("r", DOT_RADIUS)
         }
-
       svg.append("line")
         .attr("class", "scatter plot nyc connector")
         .attr("data-variable", variable)
@@ -1201,7 +1092,6 @@ function drawGraphic(containerWidth) {
         .attr("r", DOT_RADIUS)
         .data(nycData[variable + "2013"])
 
-
       svg.append("line")
         .attr("class", "scatter plot borough connector")
         .attr("data-variable", variable)
@@ -1221,7 +1111,6 @@ function drawGraphic(containerWidth) {
         .attr("cx", x(2013))
         .attr("cy", y(scatterMax * -.5))
         .attr("r", DOT_RADIUS)
-
       svg.append("line")
         .attr("class", "scatter plot puma connector")
         .attr("data-variable", variable)
@@ -1241,55 +1130,46 @@ function drawGraphic(containerWidth) {
         .attr("cx", x(2013))
         .attr("cy", y(scatterMax * -.5))
         .attr("r", DOT_RADIUS)
-
     }
-
     var row = d3.select(".scatter.row")
               .style("width", "100%")
               .style("height", containerWidth*.725 + "px")
-
     row.append("div")
       .attr("id", "unbankedPlot")
       .style("margin", layout.desktop.topRow.top + "px " + layout.desktop.topRow.internal.small + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.internal.large + "px")
       .style("width", topRowWidth + "px")
       .style("height", topRowWidth + "px")
       .style("float", "left")
-
     row.append("div")
       .attr("id", "underbankedPlot")
       .style("margin", layout.desktop.topRow.top + "px " + 0 + "px " + layout.desktop.topRow.bottom + "px " + 0 + "px")
       .style("width", topRowWidth + "px")
       .style("height", topRowWidth + "px")
       .style("float", "left")
-
     row.append("div")
       .attr("id", "povertyPlot")
       .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.large + "px " + layout.desktop.bottomRow.bottom + "px " + layout.desktop.bottomRow.left + "px")
       .style("width", bottomRowWidth + "px")
       .style("height", bottomRowWidth + "px")
       .style("float", "left")
-
     row.append("div")
       .attr("id", "incomePlot")
       .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
       .style("width", bottomRowWidth + "px")
       .style("height", bottomRowWidth + "px")
       .style("float", "left")
-
     row.append("div")
       .attr("id", "unemploymentPlot")
       .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
       .style("width", bottomRowWidth + "px")
       .style("height", bottomRowWidth + "px")
       .style("float", "left")
-
     row.append("div")
       .attr("id", "prepaidPlot")
       .style("margin", 0 + "px " + layout.desktop.bottomRow.right + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
       .style("width", bottomRowWidth + "px")
       .style("height", bottomRowWidth + "px")
       .style("float","left")
-
 
     drawScatter("unbanked")
     drawScatter("underbanked")
@@ -1298,14 +1178,12 @@ function drawGraphic(containerWidth) {
     drawScatter("unemployment")
     drawScatter("prepaid")
     pymChild.sendHeight()
-
     d3.selectAll(".dot.plot")
       .on("mousemove", function(){ dispatch.scatterTooltip(this); })
       .on("mouseout", function(){ d3.select(".scatter.tooltip").transition().duration(200).style("opacity",0)})
     d3.selectAll(".connector.plot")
       .on("mousemove", function(){ dispatch.scatterTooltip(this); })
       .on("mouseout", function(){ d3.select(".scatter.tooltip").transition().duration(200).style("opacity",0)})
-
 
     dispatch.on("deselectEntities.scatter", function(eventType){
       var returnDefaults = function(variable){
@@ -1317,7 +1195,6 @@ function drawGraphic(containerWidth) {
               .domain([0, scatterMax])
               .range([ height - layout.desktop[row].plot.bottom, layout.desktop[row].plot.top]);
         var svg = d3.select("svg." +  variable)
-
         for(var i = 2; i<7; i++){
           var boroughData = data.get(i)
           var className = boroughData.name.replace(" ","_")
@@ -1332,7 +1209,6 @@ function drawGraphic(containerWidth) {
             .transition()
             .attr("cy", y(boroughData[variable + "2013"]))
         }
-
         svg.selectAll(".scatter.puma.dot")
           .transition()
           .attr("cy", 600);
@@ -1340,7 +1216,6 @@ function drawGraphic(containerWidth) {
           .transition()
           .attr("y1", 600)
           .attr("y2", 600);
-
         svg.selectAll(".scatter.borough.dot")
           .transition()
           .attr("cy", 600);
@@ -1348,8 +1223,6 @@ function drawGraphic(containerWidth) {
           .transition()
           .attr("y1", 600)
           .attr("y2", 600);
-
-
       }
       if(d3.select(".clicked").node() ==  null){
         returnDefaults("unbanked")
@@ -1361,7 +1234,6 @@ function drawGraphic(containerWidth) {
         pymChild.sendHeight()
       }
     })
-
     dispatch.on("selectEntity.scatter", function(d){
       var updateScatter = function(variable){
         var width = (variable === "unbanked" || variable == "underbanked") ? topRowWidth : bottomRowWidth;
@@ -1372,11 +1244,9 @@ function drawGraphic(containerWidth) {
               .domain([0, scatterMax])
               .range([ height - layout.desktop[row].plot.bottom, layout.desktop[row].plot.top]);
         var svg = d3.select("svg." +  variable);
-
         var boroughID = BOROUGHS[d.borough];
         var pumaID = d.id;
         var boroughData = data.get(BOROUGHS[d.borough]);
-
         svg.selectAll("circle.temp")
           .transition()
           .duration(800)
@@ -1386,7 +1256,6 @@ function drawGraphic(containerWidth) {
           .duration(800)
           .attr("y1", 600)
           .attr("y2", 600)
-
         svg.select(".scatter.puma.dot.y2011")
           .attr("value", pumaID)
           .transition()
@@ -1400,7 +1269,6 @@ function drawGraphic(containerWidth) {
           .transition()
           .attr("y1", y(d[variable + "2011"]))
           .attr("y2", y(d[variable + "2013"]));
-
         svg.select(".scatter.borough.dot.y2011")
           .attr("value", boroughID)
           .transition()
@@ -1414,9 +1282,7 @@ function drawGraphic(containerWidth) {
           .transition()
           .attr("y1", y(boroughData[variable + "2011"]))
           .attr("y2", y(boroughData[variable + "2013"]));
-
       }
-
       updateScatter("unbanked")
       updateScatter("underbanked")
       updateScatter("poverty")
@@ -1426,7 +1292,6 @@ function drawGraphic(containerWidth) {
     });
     
   });
-
   dispatch.on("load.tooltip", function(data){
     var tooltip = d3.select(".scatter.row")
       .append("div")
@@ -1434,8 +1299,6 @@ function drawGraphic(containerWidth) {
       .style("opacity",0)
       .style("width", SCATTER_TOOLTIP_WIDTH + "px")
       .style("height", SCATTER_TOOLTIP_HEIGHT_SMALL + "px")
-
-
 
     dispatch.on("scatterTooltip.tooltip", function(element){
       var el = d3.select(element)
@@ -1448,7 +1311,6 @@ function drawGraphic(containerWidth) {
       var manhattanBold = false;
       var statenBold = false;
       var bronxBold = false;
-
       if(el.attr("class").search("puma") != -1){
         pumaBold = true;
       }
@@ -1473,19 +1335,15 @@ function drawGraphic(containerWidth) {
       else if(el.attr("class").search("Queens") != -1){
         queensBold = true;
       }
-
       var formatter = (variable === "income") ? d3.format("$000,000"):d3.format(".1%");
       var fips = el.attr("value")
-
       var selected = (d3.select(".bar.selected").node() ==  null) ? false: true;
       var height = (selected) ? SCATTER_TOOLTIP_HEIGHT_SMALL:SCATTER_TOOLTIP_HEIGHT_LARGE;
-
       tooltip.selectAll("div").remove()
       if(selected){
         var pumaID = parseInt(d3.select(".puma[data-variable=" + variable + "]").attr("value"))
         var puma = data.get(parseInt(pumaID))
         var boroughID = BOROUGHS[puma.borough]
-
         tooltip.append("div")
           .attr("class", "tooltip text")
           .classed("emphasis", nycBold)
@@ -1531,16 +1389,12 @@ function drawGraphic(containerWidth) {
         .style("top", (mouse.y - height - 10 - DOT_RADIUS) + "px")
         .duration(200)
         .style("opacity", 1)
-
     })
   })
-
 }
 var mouse = {x: 0, y: 0};
-
 document.addEventListener('mousemove', function(e){ 
     mouse.x = e.clientX || e.pageX; 
     mouse.y = e.clientY || e.pageY 
 }, false);
-
 pymChild = new pym.Child({ renderCallback: drawGraphic });
