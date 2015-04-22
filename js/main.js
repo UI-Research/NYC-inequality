@@ -347,7 +347,6 @@ function drawGraphic(containerWidth) {
         pumaKey.append("text");
     var boroughKey = key.append("g")
               .attr("class", "borough");
-        boroughKey.append("text");
     var nycKey = key.append("g")
               .attr("class", "nyc");
     var defaultKeys = key.append("g")
@@ -374,6 +373,47 @@ function drawGraphic(containerWidth) {
       .attr("x", 85)
       .attr("y", 15)
       .text("NYC average");
+
+    boroughKey.append("line")
+        .attr("class", "scatter borough connector")
+        .attr("x1", 10)
+        .attr("x2", 65)
+        .attr("y1", 300)
+        .attr("y2", 300);
+      boroughKey.append('circle')
+        .attr("class","scatter borough dot key")
+        .attr("cx", 10)
+        .attr("cy", 300)
+        .attr("r", DOT_RADIUS);
+      boroughKey.append('circle')
+        .attr("class","scatter borough dot key")
+        .attr("cx", 65)
+        .attr("cy", 300)
+        .attr("r", DOT_RADIUS);
+      boroughKey
+        .append("text")
+        .attr("class", "scatter borough text")
+        .attr("x", 85)
+        .attr("y", 300)
+        .text("");
+
+      pumaKey.append("line")
+        .attr("class", "scatter puma connector")
+        .attr("x1", 10)
+        .attr("x2", 65)
+        .attr("y1", 300)
+        .attr("y2", 300);
+      pumaKey.append('circle')
+        .attr("class","scatter puma dot key")
+        .attr("cx", 10)
+        .attr("cy", 300)
+        .attr("r", DOT_RADIUS);
+      pumaKey.append('circle')
+        .transition()
+        .attr("class","scatter puma dot key")
+        .attr("cx", 65)
+        .attr("cy", 300)
+        .attr("r", DOT_RADIUS);
 
     defaultKeys
       .attr("transform", "translate(0,12)")
@@ -444,55 +484,25 @@ function drawGraphic(containerWidth) {
         .duration(800)
         .attr("transform", "translate(0,300)");
 
-      boroughKey.selectAll(".scatter").remove();
-      boroughKey.append("line")
+        boroughKey.select(".connector")
         .transition()
-        .attr("class", "scatter borough connector")
-        .attr("x1", 10)
-        .attr("x2", 65)
         .attr("y1", 10)
         .attr("y2", 10);
-      boroughKey.append('circle')
+      boroughKey.selectAll(".dot")
         .transition()
-        .attr("class","scatter borough dot key")
-        .attr("cx", 10)
         .attr("cy", 10)
-        .attr("r", DOT_RADIUS);
-      boroughKey.append('circle')
+      boroughKey.select("text")
         .transition()
-        .attr("class","scatter borough dot key")
-        .attr("cx", 65)
-        .attr("cy", 10)
-        .attr("r", DOT_RADIUS);
-      boroughKey
-        .append("text")
-        .transition()
-        .attr("class", "scatter borough text")
-        .attr("x", 85)
         .attr("y", 15)
         .text(formatBorough(puma.borough));
-
-      pumaKey.selectAll(".scatter").remove();
-      pumaKey.append("line")
+      pumaKey.select(".connector")
         .transition()
-        .attr("class", "scatter puma connector")
-        .attr("x1", 10)
-        .attr("x2", 65)
         .attr("y1", 10)
         .attr("y2", 10);
-      pumaKey.append('circle')
+      pumaKey.selectAll('.dot')
         .transition()
-        .attr("class","scatter puma dot key")
-        .attr("cx", 10)
         .attr("cy", 10)
-        .attr("r", DOT_RADIUS);
-      pumaKey.append('circle')
-        .transition()
-        .attr("class","scatter puma dot key")
-        .attr("cx", 65)
-        .attr("cy", 10)
-        .attr("r", DOT_RADIUS);
-      
+      pumaKey.selectAll("text").remove()
       for (var i = 0; i<lineCount; i++){
         pumaKey
           .append("text")
@@ -1269,7 +1279,7 @@ function drawGraphic(containerWidth) {
       .on("click", function(d){ console.log(this, d)})
 
     dispatch.on("deselectEntities.scatter", function(eventType){
-        var returnDefaults = function(variable){
+      var returnDefaults = function(variable){
         var width = (variable === "unbanked" || variable == "underbanked") ? topRowWidth : bottomRowWidth;
         var height = width;
         var row = (variable === "unbanked" || variable == "underbanked") ? "topRow" : "bottomRow"
@@ -1312,13 +1322,15 @@ function drawGraphic(containerWidth) {
 
 
       }
-      returnDefaults("unbanked")
-      returnDefaults("underbanked")
-      returnDefaults("poverty")
-      returnDefaults("income")
-      returnDefaults("unemployment")
-      returnDefaults("prepaid")
-      pymChild.sendHeight()
+      if(d3.select(".clicked").node() ==  null){
+        returnDefaults("unbanked")
+        returnDefaults("underbanked")
+        returnDefaults("poverty")
+        returnDefaults("income")
+        returnDefaults("unemployment")
+        returnDefaults("prepaid")
+        pymChild.sendHeight()
+      }
     })
 
     dispatch.on("selectEntity.scatter", function(d){
@@ -1379,9 +1391,6 @@ function drawGraphic(containerWidth) {
   });
 
 }
-
-
-
 
 
 pymChild = new pym.Child({ renderCallback: drawGraphic });
