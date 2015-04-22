@@ -117,7 +117,7 @@ function drawGraphic(containerWidth) {
   return -1;
 }
 
-  var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "sortBars", "bucketHighlight", "deselectEntities");
+  var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "clickEntity", "sortBars", "bucketHighlight", "deselectEntities");
 
   d3.csv("../data/data.csv", function(error, pumas) {
     if (error) throw error;
@@ -148,13 +148,17 @@ function drawGraphic(containerWidth) {
 
   dispatch.on("deselectEntities", function(eventType){
     d3.selectAll(".bar.selected").classed("selected", false);
+    var clicked = d3.select(".bar.clicked")
+    if(clicked.node() != null){
+      clicked.classed("selected", true)
+      dispatch.selectEntity(clicked.data()[0])
+    }
     d3.selectAll(".puma.selected").classed("selected", false);
-
-    var tooltip = d3.select(".bar.tooltip")
-    var y = tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/)[1]
-    tooltip.transition()
-      .attr("transform", "translate(2000," + y + ")")
-
+    var clickedPuma = d3.select(".puma.clicked")
+    if(clickedPuma.node() != null){
+      clickedPuma.classed("selected", true)
+      dispatch.selectEntity(clickedPuma.data()[0])
+    }
   });
 
   dispatch.on("load", function(data) {
@@ -504,17 +508,19 @@ function drawGraphic(containerWidth) {
     });
 
     dispatch.on("deselectEntities.menu", function(eventType){
-      key.attr("height", 160);
-      title.text("New York City Average")
+      if(d3.selectAll(".bar.clicked").node() == null){
+        key.attr("height", 160);
+        title.text("New York City Average")
 
-      nycKey.transition()
-        .attr("transform", "translate(0,0)");
-      pumaKey.transition()
-        .attr("transform", "translate(0,300)");
-      boroughKey.transition()
-        .attr("transform", "translate(0,300)");
-      defaultKeys.transition()
-      .attr("transform", "translate(0,12)");
+        nycKey.transition()
+          .attr("transform", "translate(0,0)");
+        pumaKey.transition()
+          .attr("transform", "translate(0,300)");
+        boroughKey.transition()
+          .attr("transform", "translate(0,300)");
+        defaultKeys.transition()
+        .attr("transform", "translate(0,12)");
+      }
     })
   });
 
@@ -622,6 +628,7 @@ function drawGraphic(containerWidth) {
         .attr("x", 0)
         .attr("width", function(d) { return width - x(d.unbanked2013); })
         .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); })
+        .on("click", function(d){ dispatch.clickEntity(data.get(d.id)); dispatch.selectEntity(data.get(d.id))})
         .on("mouseout", function(d) { dispatch.deselectEntities("mouseout"); })
 
     var tooltip = svg.append("g")
@@ -630,6 +637,15 @@ function drawGraphic(containerWidth) {
 
     tooltip.append("text")
       .attr("class", "value")
+
+    dispatch.on("clickEntity.bar", function(d){
+      scrollDown();
+      var clicked = d3.select(".bar.fips_" + d.id)
+      var isClicked = clicked.classed("clicked")
+      if(!isClicked){ d3.selectAll(".bar").classed("clicked",false) }
+      clicked.classed("selected", !isClicked)
+      clicked.classed("clicked", !isClicked)
+    });
 
     dispatch.on("selectEntity.bar", function(d) {
       d3.selectAll(".bar").classed("selected",false)
@@ -663,9 +679,25 @@ function drawGraphic(containerWidth) {
         .attr("y",-20)
         .attr("width",bbox.width + 10)
         .attr("height",bbox.height + 10)
-
-
     });
+
+    dispatch.on("deselectEntities.bars", function(eventType){
+      var tooltip = d3.select(".bar.tooltip")
+      if(d3.selectAll(".bar.clicked").node() == null){
+        var tooltipY = tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/)[1]
+        tooltip.transition()
+          .attr("transform", "translate(2000," + tooltipY + ")")
+      }
+      else{
+        var bar = d3.select(".bar.clicked")
+        var d = bar.datum()
+        var tooltipY = bar.attr("y")
+        var context = bar.attr("value")
+        var tooltipX = getTooltipX(x, d, width, context, tooltip)
+        tooltip.transition()
+          .attr("transform", "translate(" + tooltipX + "," + (parseFloat(tooltipY)+12.0) + ")")
+      }
+    })
 
     dispatch.on("changeContext.bar", function(type, year) {
       var context = getContext(type, year);
@@ -760,6 +792,15 @@ function drawGraphic(containerWidth) {
     d3.select(".puma.fips_" + d.id).classed("selected",true)
   });
 
+  dispatch.on("clickEntity.puma", function(d){
+      scrollDown();
+      var clicked = d3.select(".puma.fips_" + d.id)
+      var isClicked = clicked.classed("clicked")
+      if(!isClicked){ d3.selectAll(".puma").classed("clicked",false) }
+      clicked.classed("selected", !isClicked)
+      clicked.classed("clicked", !isClicked)
+  });
+
   dispatch.on("load.map", function(data) {
     var values = data.values().sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).filter(function(d){ return d.isPuma}).reverse()
     values.forEach(function(d){
@@ -768,6 +809,7 @@ function drawGraphic(containerWidth) {
       .style("fill", getColor(d, "unbanked2013"))
       .on("mouseover",function(d){ dispatch.selectEntity(data.get(d.id)) })
       .on("mouseout", function(d) { dispatch.deselectEntities("mouseout"); })
+      .on("click", function(d){ dispatch.clickEntity(data.get(d.id)); dispatch.selectEntity(data.get(d.id))})
     });
 
     dispatch.on("changeContext.map", function(type,year){
@@ -801,7 +843,7 @@ function drawGraphic(containerWidth) {
 
     svg.append("rect")
       .attr("width", 235)
-      .attr("height", 131)
+      .attr("height", 144)
       .attr("x", 7)
       .attr("y", 7)
       .style("fill", "#fff")
@@ -956,9 +998,47 @@ function drawGraphic(containerWidth) {
       .attr("y", mapHeight*0.3)
       .text("NEW JERSEY")
 
+    dispatch.on("selectEntity.key", function(puma){
+      d3.selectAll(".key.selected").classed("selected", false)
+      pumaName
+        .text(puma.name)
+        .call(wrap, 135)
+      var type = d3.select("button.type.selected").node()
+      var year = d3.select("button.year.selected").node()
+      var context = getContext(type,year);
+      d3.select(".legend.value")
+        .classed("nyc", false)
+        .classed("puma", true)
+        .text(formatter(puma[context]))
+      var key = d3.select(".legend.key.bucket_" + getBuckets(BREAKS, puma[context])[1])
+      key.classed("selected", true)
+      key.node().parentNode.appendChild(key.node())
+    });
+
+    dispatch.on("changeContext.key", function(type, year){
+      var context = getContext(type, year)
+      var legendTitle = d3.select(".map.legend .legend.title")
+      legendTitle.text("Percent " + context.split("2")[0].replace(/^u/,"U") + ", 2" + context.split("2")[1])
+    })
+
+    dispatch.on("deselectEntities.key", function(eventType){
+      if(d3.selectAll(".bar.clicked").node() == null){
+        pumaName
+          .text("New York City Average")
+          .call(wrap, 130)
+        var type = d3.select("button.type.selected").node()
+        var year = d3.select("button.year.selected").node()
+        var context = getContext(type,year);
+        d3.select(".legend.value")
+          .classed("nyc", true)
+          .classed("puma", false)
+          .text(formatter(data.get(1)[context]))
+        d3.select(".legend.key.selected")
+          .classed("selected", false)
+      }
+    })
+
   })
-
-
 
   dispatch.on("load.scatter", function(data){
     var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
@@ -1013,7 +1093,6 @@ function drawGraphic(containerWidth) {
         .ticks(SCATTER_TICKS)
         .tickFormat(formatter);
 
-
       y.ticks(SCATTER_TICKS).forEach(function(d){
       svg.append("line")
         .attr("class", "gridLine")
@@ -1023,6 +1102,18 @@ function drawGraphic(containerWidth) {
         .attr("y2", y(d));
       })   
     
+      svg.append("line")
+        .attr("class", "parallelCoordsLine")
+        .attr("x1",x(2011))
+        .attr("x2",x(2011))
+        .attr("y1",y(0))
+        .attr("y2",y(scatterMax))
+      svg.append("line")
+        .attr("class", "parallelCoordsLine")
+        .attr("x1",x(2013))
+        .attr("x2",x(2013))
+        .attr("y1",y(0))
+        .attr("y2",y(scatterMax))
       var xAxis = d3.svg.axis()
         .scale(x)
         .orient('bottom')
@@ -1074,11 +1165,14 @@ function drawGraphic(containerWidth) {
         .attr("cx", x(2011))
         .attr("cy", y(nycData[variable + "2011"]))
         .attr("r", DOT_RADIUS)
+        .data(nycData[variable + "2011"])
       svg.append("circle")
         .attr("class","scatter nyc dot y2013")
         .attr("cx", x(2013))
         .attr("cy", y(nycData[variable + "2013"]))
         .attr("r", DOT_RADIUS)
+        .data(nycData[variable + "2013"])
+
 
       svg.append("line")
         .attr("class", "scatter borough connector")
@@ -1170,6 +1264,9 @@ function drawGraphic(containerWidth) {
     drawScatter("unemployment")
     drawScatter("prepaid")
     pymChild.sendHeight()
+
+    d3.selectAll(".dot")
+      .on("click", function(d){ console.log(this, d)})
 
     dispatch.on("deselectEntities.scatter", function(eventType){
         var returnDefaults = function(variable){

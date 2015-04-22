@@ -27,9 +27,17 @@ body{
   display: none;
 }
 
-.selected{
+button.selected, .puma.selected, .bar.selected{
 	fill: #ff6d22 !important;
 	background: #ff6d22;
+}
+.puma.clicked, .bar.clicked{
+	fill: #ff6d22 !important;
+	background: #ff6d22;
+}
+
+.key.selected{
+	stroke: #ff6d22 !important;	
 }
 
 .nycDashedLine{
@@ -154,10 +162,11 @@ body{
 .scatter.temp{
 	stroke: #cccccc;
 }
-
-
 .scatter.connector{
 	stroke-width: 3pt;
+}
+.parallelCoordsLine{
+	stroke: #333;
 }
 
 /*Boroughs*/
@@ -202,8 +211,15 @@ svg.map{
 	stroke-width: 2px;
 	pointer-events: visible !important;
 }
-.legend.nyc.value{
+.legend.value{
 	font: 20pt HelveticaNeue-Bold;
+	stroke: none;
+}
+.legend.nyc.value{
+	fill: #000000;
+}
+.legend.puma.value{
+	fill: #ff6d22;
 }
 .legend.more{
 	font: 9pt HelveticaNeue-Italic;
