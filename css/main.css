@@ -10,6 +10,7 @@ body{
 .custom-combobox {
 	position: relative;
 	display: inline-block;
+    margin-bottom:10px;
 }
 .custom-combobox-toggle {
 	position: absolute;
@@ -90,7 +91,8 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 #bottomMenuContainer .title{
-	font: 26pt HelveticaNeue-Bold;
+	font: 24pt HelveticaNeue-Bold;
+    margin-bottom: 10px;
 }
 
 .helpText{
@@ -130,11 +132,11 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 .scatter.title{
-	font: 18pt HelveticaNeue-Bold;
+	font: 15pt HelveticaNeue-Bold;
 }
 
 .scatter.axis text{
-	font: 12pt HelveticaNeue;
+	font: 11pt HelveticaNeue;
 }
 
 .scatter.axis.y path{
@@ -178,7 +180,7 @@ button.selected, .puma.selected, .bar.selected{
 	stroke-width: 3pt;
 }
 .parallelCoordsLine{
-	stroke: #333;
+	stroke: #999;
 }
 
 /*Boroughs*/
