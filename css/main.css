@@ -27,6 +27,19 @@ body{
   display: none;
 }
 
+button{
+ height: 45px;
+    padding-left: 15px;
+    padding-right:15px;
+    border: 0;
+    font-size: 12pt;
+    font-family: HelveticaNeue, 'Arial',sans-serif;
+    font-weight: 700;
+}
+button:hover{
+    background-color: #000;
+    color:#fff;
+}
 button.selected, .puma.selected, .bar.selected{
 	fill: #ff6d22 !important;
 	background: #ff6d22;
