@@ -12,8 +12,8 @@ var BOROUGHS = {"Bronx": 2, "Manhattan": 3, "Staten": 4, "Brooklyn": 5, "Queens"
 
 var BREAK_ONE = 1140;
 var BREAK_TWO = 768;
-var BREAK_THREE = 600;
-var mapWidth = 1;
+var BREAK_THREE = 500;
+var mapWidth = 0;
 
 
 var desktop = true;
@@ -147,7 +147,10 @@ function drawGraphic(containerWidth) {
       if(deviceWidth >= BREAK_ONE){
         d3.selectAll("path.puma").style("stroke-width", "1px");
         d3.selectAll(".scatter.title").style("font-size", "18pt");
+        d3.select(".barContainer").style("display", "block");
+        d3.select("svg.map").style("width","70%");
         d3.selectAll(".map.legend text.legend.label").style("opacity", "1");
+        // d3.select("svg.map").style("display", "block")
         mapWidth = containerWidth;
       }
       else if(deviceWidth < BREAK_ONE && deviceWidth >= BREAK_TWO){
@@ -156,18 +159,25 @@ function drawGraphic(containerWidth) {
         d3.select(".barContainer").style("display", "block");
         d3.select("svg.map").style("width","70%");
         d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
+        // d3.select("svg.map").style("display", "block")
         mapWidth = containerWidth;
       }
-      else if(deviceWidth < BREAK_TWO){
-        d3.select(".barContainer").style("display", "none");;
+      else if(deviceWidth < BREAK_TWO && deviceWidth >= BREAK_THREE){
+        d3.select(".barContainer").style("display", "none");
         d3.select("svg.map").style("width","100%");
         d3.selectAll(".scatter.title").style("font-size", "14pt");
+        // d3.select("svg.map").style("display", "block")
         mapWidth = containerWidth * 1.3;
       }
+      else if(deviceWidth < BREAK_THREE){
+        d3.select(".barContainer").style("display", "block");
+        d3.select("svg.map").style("display", "none")
+        d3.select(".map.legend").style("display", "none")
+        mapWidth = containerWidth * 3;
+      }
       // drawGraphic();  
-    dispatch.load(data)   
-
-
+    dispatch.load(data)
+    // pymChild.sendHeight()
   });
   dispatch.on("deselectEntities", function(eventType){
     d3.selectAll(".bar.selected").classed("selected", false);
@@ -571,7 +581,7 @@ function drawGraphic(containerWidth) {
     var barAspectHeight = 15; 
     var barAspectWidth = 7;
     var margin = {top: 0, right: 20, bottom: 35, left: 18},
-        width = containerWidth*.3 - margin.left - margin.right,
+        width = mapWidth*.3 - margin.left - margin.right,
         height = Math.ceil((width * barAspectHeight) / barAspectWidth) - margin.top - margin.bottom;
     var values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a.unbanked2013 - b.unbanked2013}).reverse()
     var x = d3.scale.linear()
@@ -989,6 +999,21 @@ function drawGraphic(containerWidth) {
 //hacky responsiveness handled here, bc of dynamically created text in load
     var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
     var nyText = (deviceWidth > BREAK_ONE) ? "NEW YORK" : "";
+    if(deviceWidth < BREAK_THREE){
+      svg.style("display", "none")
+      d3.select("svg.map").style("display", "none")
+      d3.select(".barContainer").style("width", "100%")
+      d3.select("svg.bars").style("width", "100%")
+      // pymChild.sendHeight()
+
+    }
+    else{
+      svg.style("display", "inline-block")
+      d3.select("svg.map").style("display", "inline-block")
+      d3.select(".barContainer").style("width", "30%")
+      d3.select("svg.bars").style("width", "100%")
+      // pymChild.sendHeight()
+    }
     svg.append("text")
       .attr("class", "map state name ny")
       .attr("x", mapWidth*0.58)
@@ -1211,6 +1236,7 @@ function drawGraphic(containerWidth) {
     var row = d3.select(".scatter.row")
               .style("width", "100%")
               .style("height", containerWidth*.725 + "px")
+              .style("clear", "both")
     row.append("div")
       .attr("id", "unbankedPlot")
       .style("margin", layout.desktop.topRow.top + "px " + layout.desktop.topRow.internal.small + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.internal.large + "px")
@@ -1254,7 +1280,7 @@ function drawGraphic(containerWidth) {
     drawScatter("income")
     drawScatter("unemployment")
     drawScatter("prepaid")
-    pymChild.sendHeight()
+    // pymChild.sendHeight()
     d3.selectAll(".dot.plot")
       .on("mousemove", function(){ dispatch.scatterTooltip(this); })
       .on("mouseout", function(){ d3.select(".scatter.tooltip").transition().duration(200).style("opacity",0)})
@@ -1308,7 +1334,7 @@ function drawGraphic(containerWidth) {
         returnDefaults("income")
         returnDefaults("unemployment")
         returnDefaults("prepaid")
-        pymChild.sendHeight()
+        // pymChild.sendHeight()
       }
     })
     dispatch.on("selectEntity.scatter", function(d){
@@ -1474,4 +1500,4 @@ document.addEventListener('mousemove', function(e){
     mouse.x = e.clientX || e.pageX; 
     mouse.y = e.clientY || e.pageY 
 }, false);
-pymChild = new pym.Child({ renderCallback: drawGraphic });
+pymChild = new pym.Child({ renderCallback: drawGraphic, polling: 500});
