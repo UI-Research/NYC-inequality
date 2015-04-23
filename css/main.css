@@ -7,11 +7,15 @@ body{
 :focus{
 	outline: none;
 }
-
+.header.row{
+      border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
 /************* JQUERY AUTOCOMPLETE STYLES ********************/
 .custom-combobox {
 	position: relative;
 	display: inline-block;
+    margin-bottom:10px;
 }
 .custom-combobox-toggle {
 	position: absolute;
@@ -20,15 +24,50 @@ body{
 	margin-left: -1px;
 	padding: 0;
 }
+
+.custom-combobox input{
+  padding: 0px;
+  height: 32px;
+  /* border: none; */
+  border-radius: 0px;
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-top: none;
+  border-bottom: none;
+  padding-left: 5px;
+    background:none;
+margin-top:5px;
+}
+
+.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text {
+ background:none !important;  
+    border: none !important;
+    height:20px;
+}
+
 .custom-combobox-input {
 	margin: 0;
-	padding: 5px 10px;
+/*	padding: 5px 10px !important;*/
 }
+
+
 /************* BAR CHART STYLES ********************/
 .bar.axis {
   display: none;
 }
-
+.banked{
+ float:left;
+    margin-right: 20px;
+}
+.data.buttons{
+ float:right;   
+}
+.map.row{
+ clear: both;   
+}
+.top-combo{
+ float:left;
+}
 button{
  height: 45px;
     padding-left: 15px;
@@ -92,7 +131,8 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 #bottomMenuContainer .title{
-	font: 26pt HelveticaNeue-Bold;
+	font: 24pt HelveticaNeue-Bold;
+    margin-bottom: 10px;
 }
 
 .helpText{
@@ -106,6 +146,7 @@ button.selected, .puma.selected, .bar.selected{
   background: #f2f2f2;
   border: none;
   color: #cccccc;
+       padding: 5px 10px !important; 
 }
 
 #bottomMenuContainer a.ui-button{
@@ -132,11 +173,11 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 .scatter.title{
-	font: 18pt HelveticaNeue-Bold;
+	font: 15pt HelveticaNeue-Bold;
 }
 
 .scatter.axis text{
-	font: 12pt HelveticaNeue;
+	font: 11pt HelveticaNeue;
 }
 
 .scatter.axis.y path{
@@ -180,7 +221,7 @@ button.selected, .puma.selected, .bar.selected{
 	stroke-width: 3pt;
 }
 .parallelCoordsLine{
-	stroke: #333;
+	stroke: #999;
 }
 
 /*Boroughs*/

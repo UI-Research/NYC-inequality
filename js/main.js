@@ -484,7 +484,7 @@ function drawGraphic(containerWidth) {
 //Top menu
     var select = d3.select(".data.buttons")
       .append("div")
-      .classed("ui-widget", true)
+      .classed("ui-widget top-combo", true)
       .append("select")
       .attr("id", "combobox")
       .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
@@ -1094,7 +1094,7 @@ function drawGraphic(containerWidth) {
       if(variable === "income"){ scatterMax = SCATTER_MAX_DOLLARS}
       else if(variable === "prepaid" || variable === "unemployment"){scatterMax = SCATTER_MAX_PREPAID}
       else{ scatterMax = SCATTER_MAX_PERCENT}
-      var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "prepaid": "Percent Prepaid"};
+      var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "prepaid": "Percent Prepaid Card Use"};
       var svg = d3.select("#" + containerID)
         .append("svg")
         .attr("class", variable)
