@@ -10,6 +10,11 @@ var SCATTER_TICKS = 5;
 var DOT_RADIUS = 5;
 var BOROUGHS = {"Bronx": 2, "Manhattan": 3, "Staten": 4, "Brooklyn": 5, "Queens": 6};
 
+
+var SMALL_DESKTOP;
+var TABLET;
+var PHONE;
+
 var BREAK_ONE = 1140;
 var BREAK_TWO = 768;
 var BREAK_THREE = 500;
@@ -31,6 +36,12 @@ var layout = {"desktop": {
               "mobile": {}
         };
 function drawGraphic(containerWidth) {
+  SMALL_DESKTOP = Modernizr.mq('only all and (max-width: ' + BREAK_ONE + 'px)')
+  TABLET = Modernizr.mq('only all and (max-width: ' + BREAK_TWO + 'px)')
+  PHONE = Modernizr.mq('only all and (max-width: ' + BREAK_THREE + 'px)')
+
+
+
   var scrollDown = function(){
     window.parent.scrollFunc();
   }
@@ -141,42 +152,49 @@ function drawGraphic(containerWidth) {
         "prepaid2013": parseFloat(d["Prepaid-2013-New-Definition"])
       });
     });
+    if(PHONE){mapWidth = containerWidth*3}
+    else if(TABLET){mapWidth = containerWidth*1.3}
+    else{ mapWidth = containerWidth}
     dispatch.load(data);
-      var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+      // var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
       // console.log(deviceWidth)
-      if(deviceWidth >= BREAK_ONE){
-        d3.selectAll("path.puma").style("stroke-width", "1px");
-        d3.selectAll(".scatter.title").style("font-size", "18pt");
+      console.log(SMALL_DESKTOP, TABLET, PHONE)
+      if(PHONE){
         d3.select(".barContainer").style("display", "block");
-        d3.select("svg.map").style("width","70%");
-        d3.selectAll(".map.legend text.legend.label").style("opacity", "1");
-        // d3.select("svg.map").style("display", "block")
-        mapWidth = containerWidth;
+        d3.select("svg.map").style("display", "none")
+        d3.select(".map.legend").style("display", "none")
+        d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
       }
-      else if(deviceWidth < BREAK_ONE && deviceWidth >= BREAK_TWO){
+      else if(TABLET){
+        d3.selectAll("path.puma").style("stroke-width", "2px");
+        d3.select(".barContainer").style("display", "none");
+        d3.select("svg.map").style("width","100%");
+        d3.selectAll(".scatter.title").style("font-size", "14pt");
+        d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
+        // d3.select("svg.map").style("display", "block")
+      }
+      else if(SMALL_DESKTOP){
         d3.selectAll("path.puma").style("stroke-width", "2px");
         d3.selectAll(".scatter.title").style("font-size", "14pt");
         d3.select(".barContainer").style("display", "block");
         d3.select("svg.map").style("width","70%");
         d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
+        d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
+
         // d3.select("svg.map").style("display", "block")
-        mapWidth = containerWidth;
       }
-      else if(deviceWidth < BREAK_TWO && deviceWidth >= BREAK_THREE){
-        d3.select(".barContainer").style("display", "none");
-        d3.select("svg.map").style("width","100%");
-        d3.selectAll(".scatter.title").style("font-size", "14pt");
-        // d3.select("svg.map").style("display", "block")
-        mapWidth = containerWidth * 1.3;
-      }
-      else if(deviceWidth < BREAK_THREE){
+      else{
+         d3.selectAll("path.puma").style("stroke-width", "1px");
+        d3.selectAll(".scatter.title").style("font-size", "18pt");
         d3.select(".barContainer").style("display", "block");
-        d3.select("svg.map").style("display", "none")
-        d3.select(".map.legend").style("display", "none")
-        mapWidth = containerWidth * 3;
+        d3.select("svg.map").style("width","70%");
+        d3.selectAll(".map.legend text.legend.label").style("opacity", "1");
+        d3.select("#bottomMenuContainer .title").style("font-size", "26pt")
+
+        // d3.select("svg.map").style("display", "block")
       }
       // drawGraphic();  
-    dispatch.load(data)
+    // dispatch.load(data)  
     // pymChild.sendHeight()
   });
   dispatch.on("deselectEntities", function(eventType){
