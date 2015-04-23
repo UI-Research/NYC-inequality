@@ -167,6 +167,51 @@ button.selected, .puma.selected, .bar.selected{
 	background-image: none;
 }
 
+
+/************* TOP MENU STYLES ********************/
+
+
+.data.buttons .title{
+	font: 24pt HelveticaNeue-Bold;
+    margin-bottom: 10px;
+}
+
+.helpText{
+	font-style: italic;
+	font-weight: 200;
+}
+
+.data.buttons input{
+  width: 60%;
+  height: 17px;
+  background: #ffffff;
+  border: none;
+  color: #000000;
+  padding: 5px 10px !important; 
+}
+
+.data.buttons a.ui-button{
+  height: 27px;
+  top: -2px;
+  background: #ffffff;
+  border: none;
+  color: #cccccc;
+  border-radius: 0px;
+  background-image: url("../img/menu-arrow.png");
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: 33%;
+  border-left: 1px solid;
+}
+
+.data.buttons span{
+	background-image: none;
+}
+
+
+
+
+
 /************* SCATTER PLOT STYLES ********************/
 .plot.background{
 	fill: #f2f2f2;

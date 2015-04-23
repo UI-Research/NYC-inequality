@@ -487,7 +487,9 @@ function drawGraphic(containerWidth) {
       .classed("ui-widget top-combo", true)
       .append("select")
       .attr("id", "combobox")
-      .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
+      .on("change", function() {  
+        dispatch.selectEntity(data.get(this.value));
+      });
     
     select.selectAll("option")
       .data(values)
@@ -499,6 +501,9 @@ function drawGraphic(containerWidth) {
       $( "#combobox" ).combobox();
       $( "#bottomCombobox" ).combobox();
     }); 
+    $(".custom-combobox input").click(function(){
+     $(this).focus().val('')
+    })
     dispatch.on("selectEntity.menu", function(puma) {
       var lines = puma.name.split("/");
       var lineCount = lines.length;
