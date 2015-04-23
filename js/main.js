@@ -466,7 +466,7 @@ function drawGraphic(containerWidth) {
 //Top menu
     var select = d3.select(".data.buttons")
       .append("div")
-      .classed("ui-widget", true)
+      .classed("ui-widget top-combo", true)
       .append("select")
       .attr("id", "combobox")
       .on("change", function() { dispatch.selectEntity(data.get(this.value)); });
