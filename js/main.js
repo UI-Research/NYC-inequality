@@ -10,6 +10,12 @@ var SCATTER_TICKS = 5;
 var DOT_RADIUS = 5;
 var BOROUGHS = {"Bronx": 2, "Manhattan": 3, "Staten": 4, "Brooklyn": 5, "Queens": 6};
 
+var BREAK_ONE = 1140;
+var BREAK_TWO = 768;
+var BREAK_THREE = 600;
+var mapWidth = 1;
+
+
 var desktop = true;
 var layout = {"desktop": {
                 "topRow": { "left": 41.0, "bottom": 19.0, "right": 41.0, "top": 53.0, "internal":{"large": 26.0, "small":17.0},
@@ -136,6 +142,32 @@ function drawGraphic(containerWidth) {
       });
     });
     dispatch.load(data);
+      var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+      // console.log(deviceWidth)
+      if(deviceWidth >= BREAK_ONE){
+        d3.selectAll("path.puma").style("stroke-width", "1px");
+        d3.selectAll(".scatter.title").style("font-size", "18pt");
+        d3.selectAll(".map.legend text.legend.label").style("opacity", "1");
+        mapWidth = containerWidth;
+      }
+      else if(deviceWidth < BREAK_ONE && deviceWidth >= BREAK_TWO){
+        d3.selectAll("path.puma").style("stroke-width", "2px");
+        d3.selectAll(".scatter.title").style("font-size", "14pt");
+        d3.select(".barContainer").style("display", "block");
+        d3.select("svg.map").style("width","70%");
+        d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
+        mapWidth = containerWidth;
+      }
+      else if(deviceWidth < BREAK_TWO){
+        d3.select(".barContainer").style("display", "none");;
+        d3.select("svg.map").style("width","100%");
+        d3.selectAll(".scatter.title").style("font-size", "14pt");
+        mapWidth = containerWidth * 1.3;
+      }
+      // drawGraphic();  
+    dispatch.load(data)   
+
+
   });
   dispatch.on("deselectEntities", function(eventType){
     d3.selectAll(".bar.selected").classed("selected", false);
@@ -153,6 +185,7 @@ function drawGraphic(containerWidth) {
   });
   dispatch.on("load", function(data) {
     $(".header.row").empty();
+    d3.select(".header.row").append("div").attr("class", "data buttons")
     $(".scatter.row").empty();
     $(".barContainer").empty();
   });
@@ -421,7 +454,7 @@ function drawGraphic(containerWidth) {
     }
 
 //Top menu
-    var select = d3.select(".header.row")
+    var select = d3.select(".data.buttons")
       .append("div")
       .classed("ui-widget", true)
       .append("select")
@@ -504,23 +537,26 @@ function drawGraphic(containerWidth) {
   });
   dispatch.on("load.buttons", function(data){
     var row = d3.select(".header.row")
-    row.append("button")
+    var unbankedButtons = row.append("div").attr("class", "banked buttons")
+    var yearButtons = row.append("div").attr("class", "year buttons")
+    var dataButtons = d3.select(".data.buttons")
+    unbankedButtons.append("button")
       .attr("class", "unbanked button type selected")
       .text("Unbanked")
       .on("click", function(){ dispatch.changeContext(this, d3.select(".button.year.selected").node())});
-    row.append("button")
+    unbankedButtons .append("button")
       .attr("class", "underbanked button type")
       .text("Underbanked")
       .on("click", function(){ dispatch.changeContext(this, d3.select(".button.year.selected").node())});
-    row.append("button")
+    yearButtons.append("button")
       .attr("class", "y2011 button year")
       .text("2011")
       .on("click", function(){ dispatch.changeContext(d3.select(".button.type.selected").node(), this)});
-    row.append("button")
+    yearButtons.append("button")
       .attr("class", "y2013 button year selected")
       .text("2013")
       .on("click", function(){ dispatch.changeContext(d3.select(".button.type.selected").node(), this)});
-    row.append("button")
+    dataButtons.append("button")
       .attr("class", "sort button")
       .text("Sort bars")
       .on("click", function(){ dispatch.sortBars(d3.select(".button.type.selected").node(), d3.select(".button.year.selected").node())});
@@ -804,8 +840,8 @@ function drawGraphic(containerWidth) {
     });
   });
   dispatch.on("load.key", function(data){
-    var mapWidth = (desktop) ? containerWidth : containerWidth+1
-    var mapHeight = containerWidth
+    // var mapWidth = 
+    var mapHeight = mapWidth;
     d3.select(".map.legend").remove();
     var svg = d3.select(".map.row")
       .insert("div", "svg.map")
@@ -950,13 +986,16 @@ function drawGraphic(containerWidth) {
       .attr("x", mapWidth*0.30)
       .attr("y", mapHeight*0.38)
       .text("BROOKLYN")
+//hacky responsiveness handled here, bc of dynamically created text in load
+    var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+    var nyText = (deviceWidth > BREAK_ONE) ? "NEW YORK" : "";
     svg.append("text")
-      .attr("class", "map state name")
+      .attr("class", "map state name ny")
       .attr("x", mapWidth*0.58)
       .attr("y", mapHeight*0.29)
-      .text("NEW YORK")
+      .text(nyText)
     svg.append("text")
-      .attr("class", "map state name")
+      .attr("class", "map state name nj")
       .attr("x", mapWidth*0.015)
       .attr("y", mapHeight*0.3)
       .text("NEW JERSEY")
