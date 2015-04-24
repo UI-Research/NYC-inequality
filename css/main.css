@@ -286,8 +286,10 @@ button.selected, .puma.selected, .bar.selected{
     -webkit-filter: drop-shadow(4px 4px 6px #ccc);
     -moz-filter: drop-shadow(4px 4px 6px #ccc);
     filter: drop-shadow(4px 4px 6px #ccc);
-
-
+}
+/*phone*/
+.mobileScatter{
+	margin-bottom: 5px;
 }
 
 .scatter.tooltip:after {

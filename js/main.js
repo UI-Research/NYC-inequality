@@ -156,14 +156,16 @@ function drawGraphic(containerWidth) {
     else if(TABLET){mapWidth = containerWidth*1.3}
     else{ mapWidth = containerWidth}
     dispatch.load(data);
-      // var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
-      // console.log(deviceWidth)
-      console.log(SMALL_DESKTOP, TABLET, PHONE)
       if(PHONE){
         d3.select(".barContainer").style("display", "block");
         d3.select("svg.map").style("display", "none")
         d3.select(".map.legend").style("display", "none")
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
+        d3.selectAll(".connector").style("stroke-width","1.5pt")
+        d3.select("#bottomMenuContainer").style({"width": "100%", "height":  "initial", "margin" : "0 0 0 0"})
+        d3.select("#bottomMenuContainer svg").style("width", "100%")
+        pymChild.sendHeight()
+
       }
       else if(TABLET){
         d3.selectAll("path.puma").style("stroke-width", "2px");
@@ -171,6 +173,7 @@ function drawGraphic(containerWidth) {
         d3.select("svg.map").style("width","100%");
         d3.selectAll(".scatter.title").style("font-size", "12pt");
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
+        d3.selectAll(".connector").style("stroke-width","1.5pt")
         // d3.select("svg.map").style("display", "block")
       }
       else if(SMALL_DESKTOP){
@@ -180,16 +183,18 @@ function drawGraphic(containerWidth) {
         d3.select("svg.map").style("width","70%");
         d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
+        d3.selectAll(".connector").style("stroke-width","3pt")
 
         // d3.select("svg.map").style("display", "block")
       }
       else{
-         d3.selectAll("path.puma").style("stroke-width", "1px");
+        d3.selectAll("path.puma").style("stroke-width", "1px");
         d3.selectAll(".scatter.title").style("font-size", "16pt");
         d3.select(".barContainer").style("display", "block");
         d3.select("svg.map").style("width","70%");
         d3.selectAll(".map.legend text.legend.label").style("opacity", "1");
         d3.select("#bottomMenuContainer .title").style("font-size", "26pt")
+        d3.selectAll(".connector").style("stroke-width","3pt")
 
         // d3.select("svg.map").style("display", "block")
       }
@@ -1090,8 +1095,15 @@ function drawGraphic(containerWidth) {
     })
   })
   dispatch.on("load.scatter", function(data){
-    var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
-    var bottomRowWidth = (containerWidth - layout.desktop.bottomRow.left - layout.desktop.bottomRow.right - layout.desktop.bottomRow.internal.large - layout.desktop.bottomRow.internal.small*3.0) * 0.25;
+    var topRowWidth, bottomRowWidth;
+    if(PHONE){
+      topRowWidth = containerWidth *0.9;
+      bottomRowWidth = containerWidth*0.9;
+    }
+    else{ 
+      topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
+      bottomRowWidth = (containerWidth - layout.desktop.bottomRow.left - layout.desktop.bottomRow.right - layout.desktop.bottomRow.internal.large - layout.desktop.bottomRow.internal.small*3.0) * 0.25;
+    }
     
     var drawScatter = function(variable){
       var containerID = variable + "Plot"
@@ -1122,8 +1134,9 @@ function drawGraphic(containerWidth) {
         .attr("class","scatter title")
         .attr("x",layout.desktop[row].plotTitle.x)
         .attr("y",layout.desktop[row].plotTitle.y)
+      var bounds = (PHONE || TABLET) ? [2010.8, 2013.2]:[2010.5, 2013.5]
       var x = d3.scale.linear()
-              .domain([2010.5, 2013.5])
+              .domain(bounds)
               .range([ layout.desktop[row].plot.left , width - layout.desktop[row].plot.right])
       var y = d3.scale.linear()
             .domain([0, scatterMax])
@@ -1264,42 +1277,73 @@ function drawGraphic(containerWidth) {
               .style("width", "100%")
               .style("height", containerWidth*.725 + "px")
               .style("clear", "both")
-    row.append("div")
-      .attr("id", "unbankedPlot")
-      .style("margin", layout.desktop.topRow.top + "px " + layout.desktop.topRow.internal.small + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.internal.large + "px")
-      .style("width", topRowWidth + "px")
-      .style("height", topRowWidth + "px")
-      .style("float", "left")
-    row.append("div")
-      .attr("id", "underbankedPlot")
-      .style("margin", layout.desktop.topRow.top + "px " + 0 + "px " + layout.desktop.topRow.bottom + "px " + 0 + "px")
-      .style("width", topRowWidth + "px")
-      .style("height", topRowWidth + "px")
-      .style("float", "left")
-    row.append("div")
-      .attr("id", "povertyPlot")
-      .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.large + "px " + layout.desktop.bottomRow.bottom + "px " + layout.desktop.bottomRow.left + "px")
-      .style("width", bottomRowWidth + "px")
-      .style("height", bottomRowWidth + "px")
-      .style("float", "left")
-    row.append("div")
-      .attr("id", "incomePlot")
-      .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
-      .style("width", bottomRowWidth + "px")
-      .style("height", bottomRowWidth + "px")
-      .style("float", "left")
-    row.append("div")
-      .attr("id", "unemploymentPlot")
-      .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
-      .style("width", bottomRowWidth + "px")
-      .style("height", bottomRowWidth + "px")
-      .style("float", "left")
-    row.append("div")
-      .attr("id", "prepaidPlot")
-      .style("margin", 0 + "px " + layout.desktop.bottomRow.right + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
-      .style("width", bottomRowWidth + "px")
-      .style("height", bottomRowWidth + "px")
-      .style("float","left")
+    d3.selectAll(".mobileScatter").remove()
+    if(!PHONE){
+      row.append("div")
+        .attr("id", "unbankedPlot")
+        .style("margin", layout.desktop.topRow.top + "px " + layout.desktop.topRow.internal.small + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.internal.large + "px")
+        .style("width", topRowWidth + "px")
+        .style("height", topRowWidth + "px")
+        .style("float", "left")
+      row.append("div")
+        .attr("id", "underbankedPlot")
+        .style("margin", layout.desktop.topRow.top + "px " + 0 + "px " + layout.desktop.topRow.bottom + "px " + 0 + "px")
+        .style("width", topRowWidth + "px")
+        .style("height", topRowWidth + "px")
+        .style("float", "left")
+      row.append("div")
+        .attr("id", "povertyPlot")
+        .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.large + "px " + layout.desktop.bottomRow.bottom + "px " + layout.desktop.bottomRow.left + "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+      row.append("div")
+        .attr("id", "incomePlot")
+        .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+      row.append("div")
+        .attr("id", "unemploymentPlot")
+        .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+      row.append("div")
+        .attr("id", "prepaidPlot")
+        .style("margin", 0 + "px " + layout.desktop.bottomRow.right + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float","left")
+    }
+    else{
+      d3.select("body").append("div")
+        .attr("id", "unbankedPlot")
+        .attr("class", "mobileScatter")
+        .style("width", "100%")
+        d3.select("body").append("div")
+        .attr("id", "underbankedPlot")
+        .attr("class", "mobileScatter")
+        .style("width", "100%")
+      d3.select("body").append("div")
+        .attr("id", "povertyPlot")
+        .attr("class", "mobileScatter")
+        .style("width", "100%")
+      d3.select("body").append("div")
+        .attr("id", "incomePlot")
+        .attr("class", "mobileScatter")
+        .style("width", "100%")
+      d3.select("body").append("div")
+        .attr("id", "unemploymentPlot")
+        .attr("class", "mobileScatter")
+        .style("width", "100%")
+      d3.select("body").append("div")
+        .attr("id", "prepaidPlot")
+        .attr("class", "mobileScatter")
+        .style("width", "100%")
+      pymChild.sendHeight();
+
+    }
 
     drawScatter("unbanked")
     drawScatter("underbanked")
@@ -1307,13 +1351,15 @@ function drawGraphic(containerWidth) {
     drawScatter("income")
     drawScatter("unemployment")
     drawScatter("prepaid")
-    // pymChild.sendHeight()
     d3.selectAll(".dot.plot")
       .on("mousemove", function(){ dispatch.scatterTooltip(this); })
+      .on("click", function(){ dispatch.scatterTooltip(this); })
       .on("mouseout", function(){ d3.select(".scatter.tooltip").transition().duration(200).style("opacity",0)})
     d3.selectAll(".connector.plot")
       .on("mousemove", function(){ dispatch.scatterTooltip(this); })
+      .on("click", function(){ dispatch.scatterTooltip(this); })
       .on("mouseout", function(){ d3.select(".scatter.tooltip").transition().duration(200).style("opacity",0)})
+
 
     dispatch.on("deselectEntities.scatter", function(eventType){
       var returnDefaults = function(variable){
