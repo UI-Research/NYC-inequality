@@ -169,13 +169,13 @@ function drawGraphic(containerWidth) {
         d3.selectAll("path.puma").style("stroke-width", "2px");
         d3.select(".barContainer").style("display", "none");
         d3.select("svg.map").style("width","100%");
-        d3.selectAll(".scatter.title").style("font-size", "14pt");
+        d3.selectAll(".scatter.title").style("font-size", "12pt");
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
         // d3.select("svg.map").style("display", "block")
       }
       else if(SMALL_DESKTOP){
         d3.selectAll("path.puma").style("stroke-width", "2px");
-        d3.selectAll(".scatter.title").style("font-size", "14pt");
+        d3.selectAll(".scatter.title").style("font-size", "12pt");
         d3.select(".barContainer").style("display", "block");
         d3.select("svg.map").style("width","70%");
         d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
@@ -185,7 +185,7 @@ function drawGraphic(containerWidth) {
       }
       else{
          d3.selectAll("path.puma").style("stroke-width", "1px");
-        d3.selectAll(".scatter.title").style("font-size", "18pt");
+        d3.selectAll(".scatter.title").style("font-size", "16pt");
         d3.select(".barContainer").style("display", "block");
         d3.select("svg.map").style("width","70%");
         d3.selectAll(".map.legend text.legend.label").style("opacity", "1");
@@ -601,7 +601,7 @@ function drawGraphic(containerWidth) {
   })
   dispatch.on("load.bar", function(data) {
     var formatter = d3.format(".1%")
-    var barAspectHeight = 15; 
+    var barAspectHeight = 17; 
     var barAspectWidth = 7;
     var margin = {top: 0, right: 20, bottom: 35, left: 18},
         width = mapWidth*.3 - margin.left - margin.right,
@@ -1103,7 +1103,7 @@ function drawGraphic(containerWidth) {
       if(variable === "income"){ scatterMax = SCATTER_MAX_DOLLARS}
       else if(variable === "prepaid" || variable === "unemployment"){scatterMax = SCATTER_MAX_PREPAID}
       else{ scatterMax = SCATTER_MAX_PERCENT}
-      var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "prepaid": "Percent Prepaid Card Use"};
+      var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "prepaid": "% Prepaid Card Use"};
       var svg = d3.select("#" + containerID)
         .append("svg")
         .attr("class", variable)
