@@ -257,7 +257,7 @@ function drawGraphic(containerWidth) {
               this._trigger( "select", event, {
                 item: ui.item.option
               });
-              dispatch.clickEntity(data.get(ui.item.option.value))
+              dispatch.clickEntity(this, data.get(ui.item.option.value))
               dispatch.deselectEntities("menu")
             },
    
@@ -662,21 +662,25 @@ function drawGraphic(containerWidth) {
         .attr("x", 0)
         .attr("width", function(d) { return width - x(d.unbanked2013); })
         .on("mouseover", function(d) { dispatch.selectEntity(data.get(d.id)); })
-        .on("click", function(d){ dispatch.clickEntity(data.get(d.id))})
+        .on("click", function(d){ dispatch.clickEntity(this, data.get(d.id))})
         .on("mouseout", function(d) { dispatch.deselectEntities("mouseout"); })
     var tooltip = svg.append("g")
       .attr("class", "bar tooltip")
       
     tooltip.append("text")
       .attr("class", "value")
-    dispatch.on("clickEntity.bar", function(d){
+    dispatch.on("clickEntity.bar", function(obj, d){
       var previous = d3.select(".bar.clicked")
       var prevData = previous.data()[0]
       var clicked = d3.select(".bar.fips_" + d.id)
+      var objID = null;
+      var elem = obj.element
+      if(typeof(elem) != "undefined"){ objID = d3.select(obj.element[0]).attr("id") }
 
       if(typeof(prevData) == "undefined"){
         dispatch.selectEntity(d);
-        scrollDown();
+        
+        if(objID != "combobox") { console.log(objID); scrollDown(); }
         clicked.classed("clicked", true)
       }
       else{
@@ -687,7 +691,7 @@ function drawGraphic(containerWidth) {
         }
         else{
           dispatch.selectEntity(d);
-          scrollDown();
+          if(objID != "combobox") { scrollDown(); }
           previous.classed("clicked", false)
           previous.classed("selected", false)
           clicked.classed("clicked", true)
@@ -824,14 +828,14 @@ function drawGraphic(containerWidth) {
     d3.selectAll(".puma").classed("selected",false)
     d3.select(".puma.fips_" + d.id).classed("selected",true)
   });
-  dispatch.on("clickEntity.puma", function(d){
+  dispatch.on("clickEntity.puma", function(obj, d){
       var previous = d3.select(".puma.clicked")
       var prevData = previous.data()[0]
       var clicked = d3.select(".puma.fips_" + d.id)
 
       if(typeof(prevData) == "undefined"){
         dispatch.selectEntity(d);
-        scrollDown();
+        // scrollDown();
         clicked.classed("clicked", true)
       }
       else{
@@ -842,7 +846,7 @@ function drawGraphic(containerWidth) {
         }
         else{
           dispatch.selectEntity(d);
-          scrollDown();
+          // scrollDown();
           previous.classed("clicked", false)
           previous.classed("selected", false)
           clicked.classed("clicked", true)
@@ -858,7 +862,7 @@ function drawGraphic(containerWidth) {
       .style("fill", getColor(d, "unbanked2013"))
       .on("mouseover",function(d){ dispatch.selectEntity(data.get(d.id)) })
       .on("mouseout", function(d) { dispatch.deselectEntities("mouseout"); })
-      .on("click", function(d){ dispatch.clickEntity(data.get(d.id))})
+      .on("click", function(d){ dispatch.clickEntity(this, data.get(d.id))})
     });
     dispatch.on("changeContext.map", function(type,year){
       var context = getContext(type, year);
