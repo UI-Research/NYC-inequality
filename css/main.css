@@ -67,6 +67,8 @@ margin-top:5px;
 }
 .top-combo{
  float:left;
+    margin-top:4px;
+/*    width:250px;*/
 }
 button{
  height: 45px;
@@ -182,7 +184,7 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 .data.buttons input{
-  width: 60%;
+/*  width: 60%;*/
   height: 17px;
   background: #ffffff;
   border: none;
@@ -218,11 +220,11 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 .scatter.title{
-	font: 15pt HelveticaNeue-Bold;
+	font: 12pt HelveticaNeue-Bold;
 }
 
 .scatter.axis text{
-	font: 11pt HelveticaNeue;
+	font: 10pt HelveticaNeue;
 }
 
 .scatter.axis.y path{
@@ -323,7 +325,7 @@ svg.map{
 
 .map.borough.name{
 	fill: #ffffff;
-	font: 12pt HelveticaNeue-Bold;
+	font: 10pt HelveticaNeue-Bold;
 	letter-spacing: 2pt;
 }
 .shadow{
@@ -331,7 +333,7 @@ svg.map{
 }
 .map.state.name{
 	fill: #cccccc;
-	font: 12pt HelveticaNeue;
+	font: 10pt HelveticaNeue;
 	letter-spacing: 3pt;
 }
 /************* MAP LEGEND STYLES ********************/
