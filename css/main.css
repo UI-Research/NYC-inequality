@@ -112,7 +112,9 @@ button.selected, .puma.selected, .bar.selected{
 .bucket_4{fill:#013b82;}
 .bucket_5{fill:#002e42;}
 
-
+.bar.tooltip{
+	pointer-events: none;
+}
 .bar.tooltip .background{
 	fill: #fff;
 	opacity: .8
@@ -134,7 +136,7 @@ button.selected, .puma.selected, .bar.selected{
 
 #bottomMenuContainer .title{
 	font: 24pt HelveticaNeue-Bold;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
 }
 
 .helpText{

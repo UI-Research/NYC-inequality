@@ -386,8 +386,9 @@ function drawGraphic(containerWidth) {
       .attr("value", function(d) { return d.id; })
       .text(function(d) { return d.name; });
     var key = wrapper.append("svg")
-      .attr("width", topRowWidth * 0.64)
+      .attr("width", 400)
       .attr("height", 160)
+      .style("pointer-events", "none")
     
     var pumaKey = key.append("g")
               .attr("class", "puma");
@@ -398,10 +399,13 @@ function drawGraphic(containerWidth) {
               .attr("class", "nyc");
     var defaultKeys = key.append("g")
               .attr("class", "temp");
+    var textX = (SMALL_DESKTOP && !PHONE && !TABLET) ? 45: 85;
+    var circleX = (SMALL_DESKTOP && !PHONE && !TABLET) ? 35:65;
+
     nycKey.append("line")
       .attr("class", "scatter nyc connector")
       .attr("x1", 10)
-      .attr("x2", 65)
+      .attr("x2", circleX)
       .attr("y1", 10)
       .attr("y2", 10);     
     nycKey.append('circle')
@@ -411,18 +415,18 @@ function drawGraphic(containerWidth) {
       .attr("r", DOT_RADIUS);
     nycKey.append('circle')
       .attr("class","scatter nyc dot key")
-      .attr("cx", 65)
+      .attr("cx", circleX)
       .attr("cy", 10)
       .attr("r", DOT_RADIUS);
     nycKey.append("text")
       .attr("class", "scatter key text")
-      .attr("x", 85)
+      .attr("x", textX)
       .attr("y", 15)
       .text("NYC average");
     boroughKey.append("line")
         .attr("class", "scatter borough connector")
         .attr("x1", 10)
-        .attr("x2", 65)
+        .attr("x2", circleX)
         .attr("y1", 300)
         .attr("y2", 300);
       boroughKey.append('circle')
@@ -432,19 +436,19 @@ function drawGraphic(containerWidth) {
         .attr("r", DOT_RADIUS);
       boroughKey.append('circle')
         .attr("class","scatter borough dot key")
-        .attr("cx", 65)
+        .attr("cx", circleX)
         .attr("cy", 300)
         .attr("r", DOT_RADIUS);
       boroughKey
         .append("text")
         .attr("class", "scatter borough text")
-        .attr("x", 85)
+        .attr("x", textX)
         .attr("y", 300)
         .text("");
       pumaKey.append("line")
         .attr("class", "scatter puma connector")
         .attr("x1", 10)
-        .attr("x2", 65)
+        .attr("x2", circleX)
         .attr("y1", 300)
         .attr("y2", 300);
       pumaKey.append('circle')
@@ -455,7 +459,7 @@ function drawGraphic(containerWidth) {
       pumaKey.append('circle')
         .transition()
         .attr("class","scatter puma dot key")
-        .attr("cx", 65)
+        .attr("cx", circleX)
         .attr("cy", 300)
         .attr("r", DOT_RADIUS);
     defaultKeys
@@ -466,7 +470,7 @@ function drawGraphic(containerWidth) {
         defaultKeys.append("line")
           .attr("class", "scatter connector temp " + className)
           .attr("x1", 10)
-          .attr("x2", 65)
+          .attr("x2", circleX)
           .attr("y1", 22*(i-1))
           .attr("y2", 22*(i-1));     
         defaultKeys.append('circle')
@@ -476,12 +480,12 @@ function drawGraphic(containerWidth) {
           .attr("r", DOT_RADIUS);
         defaultKeys.append('circle')
           .attr("class","scatter dot key temp " + className)
-          .attr("cx", 65)
+          .attr("cx", circleX)
           .attr("cy", 22*(i-1))
           .attr("r", DOT_RADIUS);
         defaultKeys.append("text")
           .attr("class", "scatter key text temp " + className)
-          .attr("x", 85)
+          .attr("x", textX)
           .attr("y", 5+22*(i-1))
           .text(boroughData.name);
     }
@@ -550,7 +554,7 @@ function drawGraphic(containerWidth) {
           .append("text")
           .transition()
           .attr("class", "scatter puma text")
-          .attr("x", 85)
+          .attr("x", textX)
           .attr("y", 15*(i+1))
           .text(function(){ 
             if (i != lineCount-1){ return lines[i].trim() + "/" }
@@ -685,7 +689,7 @@ function drawGraphic(containerWidth) {
       if(typeof(prevData) == "undefined"){
         dispatch.selectEntity(d);
         
-        if(objID != "combobox") { console.log(objID); scrollDown(); }
+        if(objID != "combobox") { scrollDown(); }
         clicked.classed("clicked", true)
       }
       else{
