@@ -16,8 +16,9 @@ var TABLET;
 var PHONE;
 
 var BREAK_ONE = 1140;
-var BREAK_TWO = 768;
-var BREAK_THREE = 500;
+var BREAK_TWO = 860;
+var BREAK_THREE = 768;
+var BREAK_FOUR = 500;
 var mapWidth = 0;
 
 
@@ -37,8 +38,9 @@ var layout = {"desktop": {
         };
 function drawGraphic(containerWidth) {
   SMALL_DESKTOP = Modernizr.mq('only all and (max-width: ' + BREAK_ONE + 'px)')
-  TABLET = Modernizr.mq('only all and (max-width: ' + BREAK_TWO + 'px)')
-  PHONE = Modernizr.mq('only all and (max-width: ' + BREAK_THREE + 'px)')
+  VERY_SMALL_DESKTOP = Modernizr.mq('only all and (max-width: ' + BREAK_TWO + 'px)')
+  TABLET = Modernizr.mq('only all and (max-width: ' + BREAK_THREE + 'px)')
+  PHONE = Modernizr.mq('only all and (max-width: ' + BREAK_FOUR + 'px)')
 
 
 
@@ -170,16 +172,32 @@ function drawGraphic(containerWidth) {
       else if(TABLET){
         d3.selectAll("path.puma").style("stroke-width", "2px");
         d3.select(".barContainer").style("display", "none");
+        d3.select("svg.map").style("display", "block")
         d3.select("svg.map").style("width","100%");
+        d3.select(".map.legend").style("display", "block")
+        d3.select(".map.legend svg").style("display", "inline-block")
         d3.selectAll(".scatter.title").style("font-size", "12pt");
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
         d3.selectAll(".connector").style("stroke-width","1.5pt")
-        // d3.select("svg.map").style("display", "block")
+      }
+      else if(VERY_SMALL_DESKTOP){
+        d3.selectAll("path.puma").style("stroke-width", "2px");
+        d3.selectAll(".scatter.title.topRow").style("font-size", "12pt");
+        d3.selectAll(".scatter.title.bottomRow").style("font-size", "10pt");
+        d3.select(".barContainer").style("display", "block");
+        d3.select("svg.map").style("display","inline-block");
+        d3.select("svg.map").style("float","left");
+        d3.select("svg.map").style("width","70%");
+        d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
+        d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
+        d3.selectAll(".connector").style("stroke-width","3pt")
       }
       else if(SMALL_DESKTOP){
         d3.selectAll("path.puma").style("stroke-width", "2px");
-        d3.selectAll(".scatter.title").style("font-size", "12pt");
+        d3.selectAll(".scatter.title").style("font-size",  "12pt");
         d3.select(".barContainer").style("display", "block");
+        d3.select("svg.map").style("display","inline-block");
+        d3.select("svg.map").style("float","left");
         d3.select("svg.map").style("width","70%");
         d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
@@ -399,8 +417,9 @@ function drawGraphic(containerWidth) {
               .attr("class", "nyc");
     var defaultKeys = key.append("g")
               .attr("class", "temp");
-    var textX = (SMALL_DESKTOP && !PHONE && !TABLET) ? 45: 85;
-    var circleX = (SMALL_DESKTOP && !PHONE && !TABLET) ? 35:65;
+    var textX = (SMALL_DESKTOP && !PHONE && !TABLET) ? 35: 85;
+    var circleX = (SMALL_DESKTOP && !PHONE && !TABLET) ? 25:65;
+    var textSize = (VERY_SMALL_DESKTOP && !PHONE && !TABLET) ? "10pt": "12pt"
 
     nycKey.append("line")
       .attr("class", "scatter nyc connector")
@@ -490,6 +509,9 @@ function drawGraphic(containerWidth) {
           .text(boroughData.name);
     }
 
+    key.selectAll("text")
+      .style("font-size", textSize)
+
 //Top menu
     var select = d3.select(".data.buttons")
       .append("div")
@@ -561,6 +583,9 @@ function drawGraphic(containerWidth) {
             else{ return lines[i]}
           });
       }
+
+    key.selectAll("text")
+      .style("font-size", textSize)
     });
     dispatch.on("deselectEntities.menu", function(eventType){
       if(d3.selectAll(".bar.clicked").node() == null){
@@ -1122,7 +1147,7 @@ function drawGraphic(containerWidth) {
       var titles = {"unbanked": "Percent Unbanked", "underbanked": "Percent Underbanked", "poverty": "Poverty Rate", "income": "Median Income", "unemployment": "Unemployment Rate", "prepaid": "% Prepaid Card Use"};
       var svg = d3.select("#" + containerID)
         .append("svg")
-        .attr("class", variable)
+        .attr("class", variable + " " + row)
         .attr("width", width)
         .attr("height", height)
       svg
@@ -1135,7 +1160,7 @@ function drawGraphic(containerWidth) {
         .attr("class","plot background")
       svg.append("text")
         .text(titles[variable])
-        .attr("class","scatter title")
+        .attr("class","scatter title " + row)
         .attr("x",layout.desktop[row].plotTitle.x)
         .attr("y",layout.desktop[row].plotTitle.y)
       var bounds = (PHONE || TABLET) ? [2010.8, 2013.2]:[2010.5, 2013.5]
@@ -1363,6 +1388,10 @@ function drawGraphic(containerWidth) {
       .on("mousemove", function(){ dispatch.scatterTooltip(this); })
       .on("click", function(){ dispatch.scatterTooltip(this); })
       .on("mouseout", function(){ d3.select(".scatter.tooltip").transition().duration(200).style("opacity",0)})
+    
+    var textSize = (VERY_SMALL_DESKTOP && !PHONE && !TABLET) ? "10pt": "12pt"
+    // d3.selectAll(".scatter.title.bottomRow")
+      // .style("font-size", textSize)
 
 
     dispatch.on("deselectEntities.scatter", function(eventType){
