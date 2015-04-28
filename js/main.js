@@ -33,7 +33,12 @@ var layout = {"desktop": {
                   "plotTitle": {"x": 15, "y": 35}
                 },
               },
-              "tablet": {},
+              "tablet": {
+                "topRow": { "left": 41.0, "bottom": 12.0, "right": 41.0, "top": 15.0, "internal":{"large": 26.0, "small":17.0},
+                  "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
+                  "plotTitle": {"x": 15, "y": 35}
+                }
+              },
               "mobile": {}
         };
 function drawGraphic(containerWidth) {
@@ -177,7 +182,7 @@ function drawGraphic(containerWidth) {
         d3.select(".map.legend").style("display", "block")
         d3.select(".map.legend svg").style("display", "inline-block")
         d3.selectAll(".scatter.title").style("font-size", "12pt");
-        d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
+        d3.select("#bottomMenuContainer .title").style("font-size", "28pt")
         d3.selectAll(".connector").style("stroke-width","1.5pt")
       }
       else if(VERY_SMALL_DESKTOP){
@@ -1129,6 +1134,10 @@ function drawGraphic(containerWidth) {
       topRowWidth = containerWidth *0.9;
       bottomRowWidth = containerWidth*0.9;
     }
+    else if(TABLET){
+      topRowWidth = (containerWidth - layout.tablet.topRow.left - layout.tablet.topRow.right - layout.tablet.topRow.internal.large) * 0.5;
+      bottomRowWidth = topRowWidth;
+    }
     else{ 
       topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
       bottomRowWidth = (containerWidth - layout.desktop.bottomRow.left - layout.desktop.bottomRow.right - layout.desktop.bottomRow.internal.large - layout.desktop.bottomRow.internal.small*3.0) * 0.25;
@@ -1307,7 +1316,8 @@ function drawGraphic(containerWidth) {
               .style("height", containerWidth*.725 + "px")
               .style("clear", "both")
     d3.selectAll(".mobileScatter").remove()
-    if(!PHONE){
+    d3.selectAll(".tabletScatter").remove()
+    if(!PHONE && !TABLET){
       row.append("div")
         .attr("id", "unbankedPlot")
         .style("margin", layout.desktop.topRow.top + "px " + layout.desktop.topRow.internal.small + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.internal.large + "px")
@@ -1344,6 +1354,60 @@ function drawGraphic(containerWidth) {
         .style("width", bottomRowWidth + "px")
         .style("height", bottomRowWidth + "px")
         .style("float","left")
+    }
+    else if(TABLET && !PHONE){
+      row.style("height", "260px")
+      d3.select("#bottomMenuContainer").style("width", "100%")
+
+      var secondRow =  d3.select("body").append("div")
+                          .attr("class", "tabletScatter")
+                          .style("width", "100%")
+                          .style("height", (100.+(topRowWidth *3)) + "px")
+                          .style("clear", "both")
+                          // .style("")
+
+      secondRow.append("div")
+        .attr("id", "unbankedPlot")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + layout.tablet.topRow.internal.small + "px " + layout.tablet.topRow.bottom + "px " + layout.tablet.topRow.left+ "px")
+        .style("width", topRowWidth + "px")
+        .style("height", topRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
+        .attr("id", "underbankedPlot")
+        .style("margin", layout.tablet.topRow.top + "px " + 0 + "px " + layout.tablet.topRow.bottom + "px " + 0 + "px")
+        .style("width", topRowWidth + "px")
+        .style("height", topRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
+        .attr("id", "povertyPlot")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + layout.tablet.topRow.internal.small + "px " + layout.tablet.topRow.bottom + "px " + layout.tablet.topRow.left+ "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
+        .attr("id", "incomePlot")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + 0 + "px " + layout.tablet.topRow.bottom + "px " + 0 + "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
+        .attr("id", "unemploymentPlot")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + layout.tablet.topRow.internal.small + "px " + layout.tablet.topRow.bottom + "px " + layout.tablet.topRow.left+ "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
+        .attr("id", "prepaidPlot")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + 0 + "px " + layout.tablet.topRow.bottom + "px " + 0 + "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float","left")
+
     }
     else{
       d3.select("body").append("div")
