@@ -130,7 +130,7 @@ function drawGraphic(containerWidth) {
   return -1;
 }
   var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "clickEntity", "sortBars", "bucketHighlight", "deselectEntities", "scatterTooltip");
-  d3.csv("../data/data.csv", function(error, pumas) {
+  d3.csv("http://ui-research.github.io/NYC-inequality/data/data.csv", function(error, pumas) {
     if (error) throw error;
     var data = d3.map();
     pumas.forEach(function(d) {
