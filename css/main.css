@@ -80,13 +80,36 @@ button{
     font-weight: 700;
 }
 button:hover{
-    background-color: #000;
+    background-color: #ff6d22;
     color:#fff;
 }
 button.selected, .puma.selected, .bar.selected{
 	fill: #ff6d22 !important;
 	background: #ff6d22;
 }
+
+.footer{
+ width: 110%;
+    background-color:#000;
+    color:#fff;
+    position: relative;
+    left: 0;
+    right: 0;
+    padding-left: 20px;
+    padding-top:20px;
+    padding-bottom:20px;
+
+}
+
+.footer-btn{
+ background-color: #fff;
+    border: 1px solid #000;
+}
+.footer-btn:hover{
+ background-color: #ff6d22;
+    border: 1px solid #000;
+}
+
 .puma.clicked, .bar.clicked{
 	fill: #ff6d22 !important;
 	background: #ff6d22;
