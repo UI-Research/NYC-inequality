@@ -148,7 +148,9 @@ button.selected, .puma.selected, .bar.selected{
 .bar.tooltip .name{
 	font: 12pt HelveticaNeue-Bold;
 }
-
+.parks{
+ pointer-events: none;
+}
 .deemphasized{
 	fill: #cccccc !important;
 }
