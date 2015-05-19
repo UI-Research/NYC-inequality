@@ -1471,10 +1471,9 @@ function drawGraphic(containerWidth) {
       .on("click", function(){ dispatch.scatterTooltip(this); })
       .on("mouseout", function(){ d3.select(".scatter.tooltip").transition().duration(200).style("opacity",0)})
     
+    var footer = d3.select(".footer")
+    footer.node().parentNode.appendChild(footer.node())
     var textSize = (VERY_SMALL_DESKTOP && !PHONE && !TABLET) ? "10pt": "12pt"
-    // d3.selectAll(".scatter.title.bottomRow")
-      // .style("font-size", textSize)
-
 
     dispatch.on("deselectEntities.scatter", function(eventType){
       var returnDefaults = function(variable){
