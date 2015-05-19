@@ -637,6 +637,20 @@ function drawGraphic(containerWidth) {
     d3.selectAll(".button.selected").classed("selected",false)
     d3.select(type).classed("selected", true)
     d3.select(year).classed("selected", true)
+    var context = getContext(type, year);
+    var selected = d3.select(".bar.selected");
+    var formatter = d3.format(".1%");
+    var keyFormatter = d3.format("%")
+    if(selected.node() != null){
+      var d = selected.datum();
+      d3.select(".tooltip .value").text(formatter(d[context]))
+      d3.select(".legend.value")
+        .text(keyFormatter(d[context]))
+      d3.selectAll(".legend.key").classed("selected", false)
+      var key = d3.select(".legend.key.bucket_" + getBuckets(BREAKS, d[context])[1])
+      key.classed("selected", true)
+      key.node().parentNode.appendChild(key.node())
+    }
   })
   dispatch.on("load.bar", function(data) {
     var formatter = d3.format(".1%")
