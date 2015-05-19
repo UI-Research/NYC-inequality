@@ -166,6 +166,7 @@ function drawGraphic(containerWidth) {
       if(PHONE){
         d3.select(".barContainer").style("display", "block");
         d3.select("svg.map").style("display", "none")
+        d3.select(".sort.button").style("display", "block")
         d3.select(".map.legend").style("display", "none")
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
         d3.selectAll(".connector").style("stroke-width","1.5pt")
@@ -178,6 +179,7 @@ function drawGraphic(containerWidth) {
         d3.selectAll("path.puma").style("stroke-width", "2px");
         d3.select(".barContainer").style("display", "none");
         d3.select("svg.map").style("display", "block")
+        d3.select(".sort.button").style("display", "none")
         d3.select("svg.map").style("width","100%");
         d3.select(".map.legend").style("display", "block")
         d3.select(".map.legend svg").style("display", "inline-block")
@@ -190,6 +192,7 @@ function drawGraphic(containerWidth) {
         d3.selectAll(".scatter.title.topRow").style("font-size", "12pt");
         d3.selectAll(".scatter.title.bottomRow").style("font-size", "10pt");
         d3.select(".barContainer").style("display", "block");
+        d3.select(".sort.button").style("display", "block")
         d3.select("svg.map").style("display","inline-block");
         d3.select("svg.map").style("float","left");
         d3.select("svg.map").style("width","70%");
@@ -201,6 +204,7 @@ function drawGraphic(containerWidth) {
         d3.selectAll("path.puma").style("stroke-width", "2px");
         d3.selectAll(".scatter.title").style("font-size",  "12pt");
         d3.select(".barContainer").style("display", "block");
+        d3.select(".sort.button").style("display", "block")
         d3.select("svg.map").style("display","inline-block");
         d3.select("svg.map").style("float","left");
         d3.select("svg.map").style("width","70%");

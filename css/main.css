@@ -345,6 +345,7 @@ button.selected, .puma.selected, .bar.selected{
 /************* MAP STYLES ********************/
 svg.map{
 	width: 70%;
+	height: 100%;
 }
 
 .barContainer{
