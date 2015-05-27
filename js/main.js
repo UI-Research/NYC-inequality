@@ -196,7 +196,7 @@ function drawGraphic(containerWidth) {
         d3.select("svg.map").style("display","inline-block");
         d3.select("svg.map").style("float","left");
         d3.select("svg.map").style("width","70%");
-                  d3.select("svg.map").style("min-height","300px");
+                  d3.select("svg.map").style("min-height","500px");
 
         d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
