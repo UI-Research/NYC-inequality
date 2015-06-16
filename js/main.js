@@ -952,7 +952,7 @@ function drawGraphic(containerWidth) {
 
     svg.append("rect")
       .attr("width", 235)
-      .attr("height", 144)
+      .attr("height", 143)
       .attr("x", 7)
       .attr("y", 7)
       .style("fill", "#fff")
@@ -1001,6 +1001,7 @@ function drawGraphic(containerWidth) {
       .attr("y", 125)
       .text("Click for more")
       .on("click", scrollDown)
+    
 //Permanent borough labels on map
     var defs = svg.append("defs");
     var filter = defs.append("filter")

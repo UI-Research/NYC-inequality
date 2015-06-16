@@ -1,5 +1,5 @@
 body{
-	font: 12pt HelveticaNeue;
+	font: 12pt HelveticaNeue, 'Arial',sans-serif;
 	min-height: 100%;
 	position: relative;
 }
@@ -127,7 +127,7 @@ button.selected, .puma.selected, .bar.selected{
 	fill: #333333;
 }
 .nycText{
-	font: 10pt HelveticaNeue;
+	font: 10pt HelveticaNeue, 'Arial', sans-serif;
 }
 .bucket_1{fill:#adcdec;}
 .bucket_2{fill:#00a9e9;}
@@ -143,10 +143,10 @@ button.selected, .puma.selected, .bar.selected{
 	opacity: .8
 }
 .bar.tooltip .value{
-	font: 14pt HelveticaNeue-Bold;
+	font: 14pt HelveticaNeue-Bold, 'Arial', sans-serif;
 }
 .bar.tooltip .name{
-	font: 12pt HelveticaNeue-Bold;
+	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
 }
 .parks{
  pointer-events: none;
@@ -160,7 +160,7 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 #bottomMenuContainer .title{
-	font: 24pt HelveticaNeue-Bold;
+	font: 24pt HelveticaNeue-Bold, 'Arial', sans-serif;
     margin-bottom: 1px;
 }
 
@@ -201,7 +201,7 @@ button.selected, .puma.selected, .bar.selected{
 
 
 .data.buttons .title{
-	font: 24pt HelveticaNeue-Bold;
+	font: 24pt HelveticaNeue-Bold, 'Arial', sans-serif;
     margin-bottom: 10px;
 }
 
@@ -247,11 +247,11 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 .scatter.title{
-	font: 12pt HelveticaNeue-Bold;
+	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
 }
 
 .scatter.axis text{
-	font: 10pt HelveticaNeue;
+	font: 10pt HelveticaNeue, 'Arial', sans-serif;
 }
 
 .scatter.axis.y path{
@@ -283,7 +283,7 @@ button.selected, .puma.selected, .bar.selected{
 }
 .scatter.text{
 	stroke: none !important;
-	font: 12pt HelveticaNeue-Bold;
+	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
 }
 .scatter.puma{
 	stroke: #ff6d22;
@@ -339,7 +339,7 @@ button.selected, .puma.selected, .bar.selected{
 	display: inline-block;
 }
 .tooltip.text.emphasis{
-	font: 12pt HelveticaNeue-Bold;
+	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
 }
 
 /************* MAP STYLES ********************/
@@ -356,7 +356,7 @@ svg.map{
 
 .map.borough.name{
 	fill: #ffffff;
-	font: 10pt HelveticaNeue-Bold;
+	font: 10pt HelveticaNeue-Bold, 'Arial', sans-serif;
 	letter-spacing: 2pt;
 }
 .shadow{
@@ -364,15 +364,15 @@ svg.map{
 }
 .map.state.name{
 	fill: #cccccc;
-	font: 10pt HelveticaNeue;
+	font: 10pt HelveticaNeue, 'Arial', sans-serif;
 	letter-spacing: 3pt;
 }
 /************* MAP LEGEND STYLES ********************/
 .legend.title{
-	font: 12pt HelveticaNeue-Bold;
+	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
 }
 .legend.label{
-	font: 9pt HelveticaNeue;
+	font: 9pt HelveticaNeue, 'Arial', sans-serif;
 }
 .legend.key{
 	stroke: #ffffff;
@@ -380,7 +380,7 @@ svg.map{
 	pointer-events: visible !important;
 }
 .legend.value{
-	font: 20pt HelveticaNeue-Bold;
+	font: 20pt HelveticaNeue-Bold, 'Arial', sans-serif;
 	stroke: none;
 }
 .legend.nyc.value{
@@ -390,9 +390,13 @@ svg.map{
 	fill: #ff6d22;
 }
 .legend.more{
-	font: 9pt HelveticaNeue-Italic;
+	font: 9pt HelveticaNeue-Italic, 'Arial', sans-serif;
 	font-style: italic;
 	pointer-events: visible !important;
+}
+.legend.def{
+    font:9pt HelveticaNeue-Italic, 'Arial', sans-serif;
+    width: 150px;
 }
 /************* STYLES FROM ILLUSTRATOR ********************/
 
@@ -414,10 +418,10 @@ svg.map{
 .st4{fill:#FFFFFF;}
 .st5{fill:#002E41;stroke:#FFFFFF;stroke-width:0.26;stroke-linecap:square;stroke-linejoin:bevel;}
 
-.st6{font-family:'HelveticaNeue-Italic';}
+.st6{font-family:'HelveticaNeue-Italic', 'Arial', sans-serif;}
 .st7{font-size:12;}
 .st8{fill:#F26E28;}
-.st9{font-family:'HelveticaNeue-Bold';}
+.st9{font-family:'HelveticaNeue-Bold', 'Arial', sans-serif;}
 .st10{font-size:36;}
 .st11{fill:none;}
 .st12{font-size:18;}
@@ -426,3 +430,7 @@ svg.map{
 .st15{fill:#CCCBCB;}
 .st16{letter-spacing:4;}
 .st17{letter-spacing:2;}
+
+.fips_3702{
+ stroke-width:0px !important;   
+}
