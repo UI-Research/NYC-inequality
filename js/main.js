@@ -18,7 +18,7 @@ var PHONE;
 var BREAK_ONE = 1140;
 var BREAK_TWO = 860;
 var BREAK_THREE = 768;
-var BREAK_FOUR = 500;
+var BREAK_FOUR = 580;
 var mapWidth = 0;
 
 
@@ -33,7 +33,12 @@ var layout = {"desktop": {
                   "plotTitle": {"x": 15, "y": 35}
                 },
               },
-              "tablet": {},
+              "tablet": {
+                "topRow": { "left": 41.0, "bottom": 12.0, "right": 41.0, "top": 15.0, "internal":{"large": 26.0, "small":17.0},
+                  "plot": {"left": 51.0, "bottom": 29.0, "right": 41.0, "top": 51.0},
+                  "plotTitle": {"x": 15, "y": 35}
+                }
+              },
               "mobile": {}
         };
 function drawGraphic(containerWidth) {
@@ -74,7 +79,6 @@ function drawGraphic(containerWidth) {
   }
   var formatBorough = function(borough){
     if (borough == "Staten"){ return "Staten Island";}
-    else if (borough == "Bronx"){ return "The Bronx";}
     else { return borough;}
   }
   var getTooltipX = function(x, d, width, context, tooltip){
@@ -130,7 +134,7 @@ function drawGraphic(containerWidth) {
   return -1;
 }
   var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "clickEntity", "sortBars", "bucketHighlight", "deselectEntities", "scatterTooltip");
-  d3.csv("../data/data.csv", function(error, pumas) {
+  d3.csv("http://ui-research.github.io/NYC-inequality/data/data.csv", function(error, pumas) {
     if (error) throw error;
     var data = d3.map();
     pumas.forEach(function(d) {
@@ -161,6 +165,7 @@ function drawGraphic(containerWidth) {
       if(PHONE){
         d3.select(".barContainer").style("display", "block");
         d3.select("svg.map").style("display", "none")
+        d3.select(".sort.button").style("display", "block")
         d3.select(".map.legend").style("display", "none")
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
         d3.selectAll(".connector").style("stroke-width","1.5pt")
@@ -173,11 +178,12 @@ function drawGraphic(containerWidth) {
         d3.selectAll("path.puma").style("stroke-width", "2px");
         d3.select(".barContainer").style("display", "none");
         d3.select("svg.map").style("display", "block")
+        d3.select(".sort.button").style("display", "none")
         d3.select("svg.map").style("width","100%");
         d3.select(".map.legend").style("display", "block")
         d3.select(".map.legend svg").style("display", "inline-block")
         d3.selectAll(".scatter.title").style("font-size", "12pt");
-        d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
+        d3.select("#bottomMenuContainer .title").style("font-size", "28pt")
         d3.selectAll(".connector").style("stroke-width","1.5pt")
       }
       else if(VERY_SMALL_DESKTOP){
@@ -185,9 +191,12 @@ function drawGraphic(containerWidth) {
         d3.selectAll(".scatter.title.topRow").style("font-size", "12pt");
         d3.selectAll(".scatter.title.bottomRow").style("font-size", "10pt");
         d3.select(".barContainer").style("display", "block");
+        d3.select(".sort.button").style("display", "block")
         d3.select("svg.map").style("display","inline-block");
         d3.select("svg.map").style("float","left");
         d3.select("svg.map").style("width","70%");
+                  d3.select("svg.map").style("min-height","500px");
+
         d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
         d3.selectAll(".connector").style("stroke-width","3pt")
@@ -196,9 +205,11 @@ function drawGraphic(containerWidth) {
         d3.selectAll("path.puma").style("stroke-width", "2px");
         d3.selectAll(".scatter.title").style("font-size",  "12pt");
         d3.select(".barContainer").style("display", "block");
+        d3.select(".sort.button").style("display", "block")
         d3.select("svg.map").style("display","inline-block");
         d3.select("svg.map").style("float","left");
         d3.select("svg.map").style("width","70%");
+        d3.select("svg.map").style("min-height","500px");
         d3.selectAll(".map.legend text.legend.label").style("opaciy", "0");
         d3.select("#bottomMenuContainer .title").style("font-size", "14pt")
         d3.selectAll(".connector").style("stroke-width","3pt")
@@ -210,6 +221,7 @@ function drawGraphic(containerWidth) {
         d3.selectAll(".scatter.title").style("font-size", "16pt");
         d3.select(".barContainer").style("display", "block");
         d3.select("svg.map").style("width","70%");
+        d3.select("svg.map").style("min-height","720px");
         d3.selectAll(".map.legend text.legend.label").style("opacity", "1");
         d3.select("#bottomMenuContainer .title").style("font-size", "26pt")
         d3.selectAll(".connector").style("stroke-width","3pt")
@@ -506,7 +518,10 @@ function drawGraphic(containerWidth) {
           .attr("class", "scatter key text temp " + className)
           .attr("x", textX)
           .attr("y", 5+22*(i-1))
-          .text(boroughData.name);
+          .text(function(){
+            if(boroughData.name == "The Bronx"){ return "Bronx"}
+            else{ return boroughData.name }
+          });
     }
 
     key.selectAll("text")
@@ -632,6 +647,20 @@ function drawGraphic(containerWidth) {
     d3.selectAll(".button.selected").classed("selected",false)
     d3.select(type).classed("selected", true)
     d3.select(year).classed("selected", true)
+    var context = getContext(type, year);
+    var selected = d3.select(".bar.selected");
+    var formatter = d3.format(".1%");
+    var keyFormatter = d3.format("%")
+    if(selected.node() != null){
+      var d = selected.datum();
+      d3.select(".tooltip .value").text(formatter(d[context]))
+      d3.select(".legend.value")
+        .text(keyFormatter(d[context]))
+      d3.selectAll(".legend.key").classed("selected", false)
+      var key = d3.select(".legend.key.bucket_" + getBuckets(BREAKS, d[context])[1])
+      key.classed("selected", true)
+      key.node().parentNode.appendChild(key.node())
+    }
   })
   dispatch.on("load.bar", function(data) {
     var formatter = d3.format(".1%")
@@ -911,7 +940,8 @@ function drawGraphic(containerWidth) {
     });
   });
   dispatch.on("load.key", function(data){
-    // var mapWidth = 
+
+        // var mapWidth = 
     var mapHeight = mapWidth;
     d3.select(".map.legend").remove();
     var svg = d3.select(".map.row")
@@ -922,10 +952,95 @@ function drawGraphic(containerWidth) {
       .append("svg")
       .attr("width", mapWidth)
       .attr("height", mapHeight)
+    //Permanent borough labels on map
+    var defs = svg.append("defs");
+    var filter = defs.append("filter")
+        .attr("id", "shadow")
+        .attr("x", "-20%")
+        .attr("y", "-19%")
+        .attr("height", "180%")
+        .attr("width", "180%")
+    filter.append("feGaussianBlur")
+        .attr("stdDeviation", "2 2")
+        .attr("result", "shadow");
+     
+    filter.append("feOffset")
+        .attr("dx", 2)
+        .attr("dy", 2)
+ 
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.26)
+      .attr("y", mapHeight*0.24)
+      .style("filter", "url(#shadow)")
+      .text("MANHATTAN")
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.26)
+      .attr("y", mapHeight*0.24)
+      .text("MANHATTAN")
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.37)
+      .attr("y", mapHeight*0.095)
+      .style("filter", "url(#shadow)")
+      .text("BRONX")      
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.37)
+      .attr("y", mapHeight*0.095)
+      .text("BRONX")
+
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.458)
+      .attr("y", mapHeight*0.27)
+      .style("filter", "url(#shadow)")
+      .text("QUEENS")      
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.458)
+      .attr("y", mapHeight*0.27)
+      .text("QUEENS")
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.11)
+      .attr("y", mapHeight*0.45)
+      .style("filter", "url(#shadow)")
+      .text("STATEN")      
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.11)
+      .attr("y", mapHeight*0.45)
+      .text("STATEN")
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", 3+mapWidth*0.11)
+      .attr("y", 20+mapHeight*0.45)
+      .style("filter", "url(#shadow)")
+      .text("ISLAND")
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", 3+mapWidth*0.11)
+      .attr("y", 20+mapHeight*0.45)
+      .text("ISLAND")
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.30)
+      .attr("y", mapHeight*0.38)
+      .style("filter", "url(#shadow)")
+      .text("BROOKLYN")
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.30)
+      .attr("y", mapHeight*0.38)
+      .text("BROOKLYN")
+
+
 
     svg.append("rect")
       .attr("width", 235)
-      .attr("height", 144)
+      .attr("height", 230)
       .attr("x", 7)
       .attr("y", 7)
       .style("fill", "#fff")
@@ -974,89 +1089,40 @@ function drawGraphic(containerWidth) {
       .attr("y", 125)
       .text("Click for more")
       .on("click", scrollDown)
-//Permanent borough labels on map
-    var defs = svg.append("defs");
-    var filter = defs.append("filter")
-        .attr("id", "shadow")
-        .attr("x", "-20%")
-        .attr("y", "-19%")
-        .attr("height", "180%")
-        .attr("width", "180%")
-    filter.append("feGaussianBlur")
-        .attr("stdDeviation", "2 2")
-        .attr("result", "shadow");
-     
-    filter.append("feOffset")
-        .attr("dx", 2)
-        .attr("dy", 2)
- 
-    svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.26)
-      .attr("y", mapHeight*0.24)
-      .style("filter", "url(#shadow)")
-      .text("MANHATTAN")
-    svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.26)
-      .attr("y", mapHeight*0.24)
-      .text("MANHATTAN")
-    svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.37)
-      .attr("y", mapHeight*0.095)
-      .style("filter", "url(#shadow)")
-      .text("THE BRONX")      
-    svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.37)
-      .attr("y", mapHeight*0.095)
-      .text("THE BRONX")
 
     svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.458)
-      .attr("y", mapHeight*0.27)
-      .style("filter", "url(#shadow)")
-      .text("QUEENS")      
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",150)
+      .text("Unbanked: No member of the household")
     svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.458)
-      .attr("y", mapHeight*0.27)
-      .text("QUEENS")
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",163)
+      .text("has a checking or savings account.")
     svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.11)
-      .attr("y", mapHeight*0.45)
-      .style("filter", "url(#shadow)")
-      .text("STATEN")      
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",182)
+      .text("Underbanked: A household member has")
     svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.11)
-      .attr("y", mapHeight*0.45)
-      .text("STATEN")
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",195)
+      .text("a bank account but someone in the")
     svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", 3+mapWidth*0.11)
-      .attr("y", 20+mapHeight*0.45)
-      .style("filter", "url(#shadow)")
-      .text("ISLAND")
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",208)
+      .text("household has used alternative financial")
     svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", 3+mapWidth*0.11)
-      .attr("y", 20+mapHeight*0.45)
-      .text("ISLAND")
-    svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.30)
-      .attr("y", mapHeight*0.38)
-      .style("filter", "url(#shadow)")
-      .text("BROOKLYN")
-    svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.30)
-      .attr("y", mapHeight*0.38)
-      .text("BROOKLYN")
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",221)
+      .text("services in the past year.")
+
+       //  household has used alternative financial ")
+    
 //hacky responsiveness handled here, bc of dynamically created text in load
     var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
     var nyText = (deviceWidth > BREAK_ONE) ? "NEW YORK" : "";
@@ -1128,6 +1194,10 @@ function drawGraphic(containerWidth) {
     if(PHONE){
       topRowWidth = containerWidth *0.9;
       bottomRowWidth = containerWidth*0.9;
+    }
+    else if(TABLET){
+      topRowWidth = (containerWidth - layout.tablet.topRow.left - layout.tablet.topRow.right - layout.tablet.topRow.internal.large) * 0.5;
+      bottomRowWidth = topRowWidth;
     }
     else{ 
       topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
@@ -1307,7 +1377,8 @@ function drawGraphic(containerWidth) {
               .style("height", containerWidth*.725 + "px")
               .style("clear", "both")
     d3.selectAll(".mobileScatter").remove()
-    if(!PHONE){
+    d3.selectAll(".tabletScatter").remove()
+    if(!PHONE && !TABLET){
       row.append("div")
         .attr("id", "unbankedPlot")
         .style("margin", layout.desktop.topRow.top + "px " + layout.desktop.topRow.internal.small + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.internal.large + "px")
@@ -1321,11 +1392,11 @@ function drawGraphic(containerWidth) {
         .style("height", topRowWidth + "px")
         .style("float", "left")
       row.append("div")
-        .attr("id", "povertyPlot")
+        .attr("id", "prepaidPlot")
         .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.large + "px " + layout.desktop.bottomRow.bottom + "px " + layout.desktop.bottomRow.left + "px")
         .style("width", bottomRowWidth + "px")
         .style("height", bottomRowWidth + "px")
-        .style("float", "left")
+        .style("float","left")
       row.append("div")
         .attr("id", "incomePlot")
         .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
@@ -1339,11 +1410,66 @@ function drawGraphic(containerWidth) {
         .style("height", bottomRowWidth + "px")
         .style("float", "left")
       row.append("div")
+        .attr("id", "povertyPlot")
+        .style("margin", 0 + "px " + layout.desktop.bottomRow.internal.small + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+
+    }
+    else if(TABLET && !PHONE){
+      row.style("height", "260px")
+      d3.select("#bottomMenuContainer").style("width", "100%")
+
+      var secondRow =  d3.select("body").append("div")
+                          .attr("class", "tabletScatter")
+                          .style("width", "100%")
+                          .style("height", (100.+(topRowWidth *3)) + "px")
+                          .style("clear", "both")
+                          // .style("")
+
+      secondRow.append("div")
+        .attr("id", "unbankedPlot")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + layout.tablet.topRow.internal.small + "px " + layout.tablet.topRow.bottom + "px " + layout.tablet.topRow.left+ "px")
+        .style("width", topRowWidth + "px")
+        .style("height", topRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
+        .attr("id", "underbankedPlot")
+        .style("margin", layout.tablet.topRow.top + "px " + 0 + "px " + layout.tablet.topRow.bottom + "px " + 0 + "px")
+        .style("width", topRowWidth + "px")
+        .style("height", topRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
+        .attr("id", "povertyPlot")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + layout.tablet.topRow.internal.small + "px " + layout.tablet.topRow.bottom + "px " + layout.tablet.topRow.left+ "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
+        .attr("id", "incomePlot")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + 0 + "px " + layout.tablet.topRow.bottom + "px " + 0 + "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
+        .attr("id", "unemploymentPlot")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + layout.tablet.topRow.internal.small + "px " + layout.tablet.topRow.bottom + "px " + layout.tablet.topRow.left+ "px")
+        .style("width", bottomRowWidth + "px")
+        .style("height", bottomRowWidth + "px")
+        .style("float", "left")
+      secondRow.append("div")
         .attr("id", "prepaidPlot")
-        .style("margin", 0 + "px " + layout.desktop.bottomRow.right + "px " + layout.desktop.bottomRow.bottom + "px " + 0 + "px")
+        .attr("class", "tabletScatter")
+        .style("margin", layout.tablet.topRow.top + "px " + 0 + "px " + layout.tablet.topRow.bottom + "px " + 0 + "px")
         .style("width", bottomRowWidth + "px")
         .style("height", bottomRowWidth + "px")
         .style("float","left")
+
     }
     else{
       d3.select("body").append("div")
@@ -1389,10 +1515,9 @@ function drawGraphic(containerWidth) {
       .on("click", function(){ dispatch.scatterTooltip(this); })
       .on("mouseout", function(){ d3.select(".scatter.tooltip").transition().duration(200).style("opacity",0)})
     
+    var footer = d3.select(".footer")
+    footer.node().parentNode.appendChild(footer.node())
     var textSize = (VERY_SMALL_DESKTOP && !PHONE && !TABLET) ? "10pt": "12pt"
-    // d3.selectAll(".scatter.title.bottomRow")
-      // .style("font-size", textSize)
-
 
     dispatch.on("deselectEntities.scatter", function(eventType){
       var returnDefaults = function(variable){
@@ -1574,7 +1699,7 @@ function drawGraphic(containerWidth) {
         tooltip.append("div")
           .attr("class", "tooltip text")
           .classed("emphasis", bronxBold)
-          .html("The Bronx: " + formatter(data.get(2)[variable + "2011"]) + ' &#10142; ' + formatter(data.get(2)[variable + "2013"]))
+          .html("Bronx: " + formatter(data.get(2)[variable + "2011"]) + ' &#10142; ' + formatter(data.get(2)[variable + "2013"]))
         tooltip.append("div")
           .attr("class", "tooltip text")
           .classed("emphasis", manhattanBold)
