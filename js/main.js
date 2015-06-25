@@ -18,7 +18,7 @@ var PHONE;
 var BREAK_ONE = 1140;
 var BREAK_TWO = 860;
 var BREAK_THREE = 768;
-var BREAK_FOUR = 500;
+var BREAK_FOUR = 580;
 var mapWidth = 0;
 
 
@@ -79,7 +79,6 @@ function drawGraphic(containerWidth) {
   }
   var formatBorough = function(borough){
     if (borough == "Staten"){ return "Staten Island";}
-    else if (borough == "Bronx"){ return "The Bronx";}
     else { return borough;}
   }
   var getTooltipX = function(x, d, width, context, tooltip){
@@ -519,7 +518,10 @@ function drawGraphic(containerWidth) {
           .attr("class", "scatter key text temp " + className)
           .attr("x", textX)
           .attr("y", 5+22*(i-1))
-          .text(boroughData.name);
+          .text(function(){
+            if(boroughData.name == "The Bronx"){ return "Bronx"}
+            else{ return boroughData.name }
+          });
     }
 
     key.selectAll("text")
@@ -938,7 +940,8 @@ function drawGraphic(containerWidth) {
     });
   });
   dispatch.on("load.key", function(data){
-    // var mapWidth = 
+
+        // var mapWidth = 
     var mapHeight = mapWidth;
     d3.select(".map.legend").remove();
     var svg = d3.select(".map.row")
@@ -949,10 +952,95 @@ function drawGraphic(containerWidth) {
       .append("svg")
       .attr("width", mapWidth)
       .attr("height", mapHeight)
+    //Permanent borough labels on map
+    var defs = svg.append("defs");
+    var filter = defs.append("filter")
+        .attr("id", "shadow")
+        .attr("x", "-20%")
+        .attr("y", "-19%")
+        .attr("height", "180%")
+        .attr("width", "180%")
+    filter.append("feGaussianBlur")
+        .attr("stdDeviation", "2 2")
+        .attr("result", "shadow");
+     
+    filter.append("feOffset")
+        .attr("dx", 2)
+        .attr("dy", 2)
+ 
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.26)
+      .attr("y", mapHeight*0.24)
+      .style("filter", "url(#shadow)")
+      .text("MANHATTAN")
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.26)
+      .attr("y", mapHeight*0.24)
+      .text("MANHATTAN")
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.37)
+      .attr("y", mapHeight*0.095)
+      .style("filter", "url(#shadow)")
+      .text("BRONX")      
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.37)
+      .attr("y", mapHeight*0.095)
+      .text("BRONX")
+
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.458)
+      .attr("y", mapHeight*0.27)
+      .style("filter", "url(#shadow)")
+      .text("QUEENS")      
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.458)
+      .attr("y", mapHeight*0.27)
+      .text("QUEENS")
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.11)
+      .attr("y", mapHeight*0.45)
+      .style("filter", "url(#shadow)")
+      .text("STATEN")      
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.11)
+      .attr("y", mapHeight*0.45)
+      .text("STATEN")
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", 3+mapWidth*0.11)
+      .attr("y", 20+mapHeight*0.45)
+      .style("filter", "url(#shadow)")
+      .text("ISLAND")
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", 3+mapWidth*0.11)
+      .attr("y", 20+mapHeight*0.45)
+      .text("ISLAND")
+    svg.append("text")
+      .attr("class", "map borough name shadow")
+      .attr("x", mapWidth*0.30)
+      .attr("y", mapHeight*0.38)
+      .style("filter", "url(#shadow)")
+      .text("BROOKLYN")
+    svg.append("text")
+      .attr("class", "map borough name")
+      .attr("x", mapWidth*0.30)
+      .attr("y", mapHeight*0.38)
+      .text("BROOKLYN")
+
+
 
     svg.append("rect")
       .attr("width", 235)
-      .attr("height", 143)
+      .attr("height", 230)
       .attr("x", 7)
       .attr("y", 7)
       .style("fill", "#fff")
@@ -1001,90 +1089,40 @@ function drawGraphic(containerWidth) {
       .attr("y", 125)
       .text("Click for more")
       .on("click", scrollDown)
-    
-//Permanent borough labels on map
-    var defs = svg.append("defs");
-    var filter = defs.append("filter")
-        .attr("id", "shadow")
-        .attr("x", "-20%")
-        .attr("y", "-19%")
-        .attr("height", "180%")
-        .attr("width", "180%")
-    filter.append("feGaussianBlur")
-        .attr("stdDeviation", "2 2")
-        .attr("result", "shadow");
-     
-    filter.append("feOffset")
-        .attr("dx", 2)
-        .attr("dy", 2)
- 
-    svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.26)
-      .attr("y", mapHeight*0.24)
-      .style("filter", "url(#shadow)")
-      .text("MANHATTAN")
-    svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.26)
-      .attr("y", mapHeight*0.24)
-      .text("MANHATTAN")
-    svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.37)
-      .attr("y", mapHeight*0.095)
-      .style("filter", "url(#shadow)")
-      .text("THE BRONX")      
-    svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.37)
-      .attr("y", mapHeight*0.095)
-      .text("THE BRONX")
 
     svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.458)
-      .attr("y", mapHeight*0.27)
-      .style("filter", "url(#shadow)")
-      .text("QUEENS")      
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",150)
+      .text("Unbanked: No member of the household")
     svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.458)
-      .attr("y", mapHeight*0.27)
-      .text("QUEENS")
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",163)
+      .text("has a checking or savings account.")
     svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.11)
-      .attr("y", mapHeight*0.45)
-      .style("filter", "url(#shadow)")
-      .text("STATEN")      
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",182)
+      .text("Underbanked: A household member has")
     svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.11)
-      .attr("y", mapHeight*0.45)
-      .text("STATEN")
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",195)
+      .text("a bank account but someone in the")
     svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", 3+mapWidth*0.11)
-      .attr("y", 20+mapHeight*0.45)
-      .style("filter", "url(#shadow)")
-      .text("ISLAND")
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",208)
+      .text("household has used alternative financial")
     svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", 3+mapWidth*0.11)
-      .attr("y", 20+mapHeight*0.45)
-      .text("ISLAND")
-    svg.append("text")
-      .attr("class", "map borough name shadow")
-      .attr("x", mapWidth*0.30)
-      .attr("y", mapHeight*0.38)
-      .style("filter", "url(#shadow)")
-      .text("BROOKLYN")
-    svg.append("text")
-      .attr("class", "map borough name")
-      .attr("x", mapWidth*0.30)
-      .attr("y", mapHeight*0.38)
-      .text("BROOKLYN")
+      .attr("class", "legend definition")
+      .attr("x", 16)
+      .attr("y",221)
+      .text("services in the past year.")
+
+       //  household has used alternative financial ")
+    
 //hacky responsiveness handled here, bc of dynamically created text in load
     var deviceWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
     var nyText = (deviceWidth > BREAK_ONE) ? "NEW YORK" : "";
@@ -1661,7 +1699,7 @@ function drawGraphic(containerWidth) {
         tooltip.append("div")
           .attr("class", "tooltip text")
           .classed("emphasis", bronxBold)
-          .html("The Bronx: " + formatter(data.get(2)[variable + "2011"]) + ' &#10142; ' + formatter(data.get(2)[variable + "2013"]))
+          .html("Bronx: " + formatter(data.get(2)[variable + "2011"]) + ' &#10142; ' + formatter(data.get(2)[variable + "2013"]))
         tooltip.append("div")
           .attr("class", "tooltip text")
           .classed("emphasis", manhattanBold)
