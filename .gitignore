@@ -1,2 +1,3 @@
 data/shapefiles/*
 *.ai
+.DS_Store
