@@ -112,6 +112,10 @@ button.selected, .puma.selected, .bar.selected{
 
 }
 
+.footer p{
+	padding-right: 100px;
+}
+
 .footer-btn{
  background-color: #fff;
     border: 1px solid #000;
@@ -131,7 +135,7 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 .nycDashedLine{
-	stroke: #aaaaaa;
+	stroke: #333333;
 }
 
 .nycArrow{

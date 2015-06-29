@@ -403,7 +403,7 @@ function drawGraphic(containerWidth) {
       .style("margin", layout.desktop.topRow.top + "px " + 0 + "px " + layout.desktop.topRow.bottom + "px " + layout.desktop.topRow.left + "px ")
     var title = wrapper.append("div")
       .attr("class", "title")
-      .text("New York City Average")
+      .text("New York City Averages")
     wrapper.append("div")
       .attr("class", "helpText")
       .text("Select another neighborhood");
@@ -607,7 +607,7 @@ function drawGraphic(containerWidth) {
     dispatch.on("deselectEntities.menu", function(eventType){
       if(d3.selectAll(".bar.clicked").node() == null){
         key.attr("height", 160);
-        title.text("New York City Average")
+        title.text("New York City Averages")
         nycKey.transition()
           .attr("transform", "translate(0,0)");
         pumaKey.transition()
@@ -701,7 +701,7 @@ function drawGraphic(containerWidth) {
     var nycData = data.get(1)
     svg.append("line")
       .attr("class", "nycDashedLine")
-      .style("stroke-dasharray", ("1, 3"))
+      .style("stroke-dasharray", ("2, 3"))
       .attr("x1", width - x(nycData.unbanked2013))
       .attr("x2", width - x(nycData.unbanked2013))
       .attr("y1", 0)
@@ -1111,7 +1111,7 @@ function drawGraphic(containerWidth) {
       .attr("class", "legend definition")
       .attr("x", 16)
       .attr("y",195)
-      .text("a bank account but someone in the")
+      .text("a bank account, but someone in the")
     svg.append("text")
       .attr("class", "legend definition")
       .attr("x", 16)
