@@ -294,8 +294,14 @@ function drawGraphic(containerWidth) {
               this._trigger( "select", event, {
                 item: ui.item.option
               });
-              dispatch.clickEntity(this, data.get(ui.item.option.value))
-              dispatch.deselectEntities("menu")
+              if(ui.item.option.value == "New York City Averages"){
+                d3.selectAll(".clicked").classed("clicked",false)
+                dispatch.deselectEntities("mouseout")
+              }
+              else{
+                dispatch.clickEntity(this, data.get(ui.item.option.value))
+                dispatch.deselectEntities("menu")
+              }
             },
    
             autocompletechange: "_removeIfInvalid"
@@ -393,6 +399,9 @@ function drawGraphic(containerWidth) {
             var textB = b.name.toUpperCase();
             return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
           });
+  
+    var nyc = {"name": "New York City Averages"}
+    values.unshift(nyc);
 //Bottom menu
     var topRowWidth = (containerWidth - layout.desktop.topRow.left - layout.desktop.topRow.right - layout.desktop.topRow.internal.large - layout.desktop.topRow.internal.small) * 0.377;
     var row = d3.select(".scatter.row")
@@ -1747,3 +1756,5 @@ document.addEventListener('mousemove', function(e){
     mouse.y = e.clientY || e.pageY 
 }, false);
 pymChild = new pym.Child({ renderCallback: drawGraphic, polling: 500});
+var referrer = document.referrer;
+console.log(referrer)
