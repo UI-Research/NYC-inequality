@@ -357,6 +357,11 @@ button.selected, .puma.selected, .bar.selected{
 	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
 }
 
+.turtleWarning{
+	font-size: 10px;
+	font-style: italic;
+	display: none;
+}
 /************* MAP STYLES ********************/
 svg.map{
 	width: 70%;

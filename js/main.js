@@ -134,7 +134,7 @@ function drawGraphic(containerWidth) {
   return -1;
 }
   var dispatch = d3.dispatch("load", "changeContext", "selectEntity", "clickEntity", "sortBars", "bucketHighlight", "deselectEntities", "scatterTooltip");
-  d3.csv("http://ui-research.github.io/NYC-inequality/data/data.csv", function(error, pumas) {
+  d3.csv("data/data.csv", function(error, pumas) {
     if (error) throw error;
     var data = d3.map();
     pumas.forEach(function(d) {
@@ -233,6 +233,8 @@ function drawGraphic(containerWidth) {
     // pymChild.sendHeight()
   });
   dispatch.on("deselectEntities", function(eventType){
+    d3.select(".turtleWarning")
+      .style("display","none")
     d3.selectAll(".bar.selected").classed("selected", false);
     var clicked = d3.select(".bar.clicked")
     if(clicked.node() != null){
@@ -1514,7 +1516,12 @@ function drawGraphic(containerWidth) {
       .on("mousemove", function(){ dispatch.scatterTooltip(this); })
       .on("click", function(){ dispatch.scatterTooltip(this); })
       .on("mouseout", function(){ d3.select(".scatter.tooltip").transition().duration(200).style("opacity",0)})
-    
+    d3.select("#povertyPlot")
+      .append("div")
+      .attr("class","turtleWarning")
+      .text("Due to sample size restrictions, the 2013 poverty rate represents a three year average over the years 2011 to 2013.")
+
+
     var footer = d3.select(".footer")
     footer.node().parentNode.appendChild(footer.node())
     var textSize = (VERY_SMALL_DESKTOP && !PHONE && !TABLET) ? "10pt": "12pt"
@@ -1569,6 +1576,14 @@ function drawGraphic(containerWidth) {
       }
     })
     dispatch.on("selectEntity.scatter", function(d){
+      if(d.id == 3808){
+        d3.select(".turtleWarning")
+          .style("display","block")
+      }
+      else{
+        d3.select(".turtleWarning")
+          .style("display","none")
+      }
       var updateScatter = function(variable){
         var width = (variable === "unbanked" || variable == "underbanked") ? topRowWidth : bottomRowWidth;
         var height = width;
