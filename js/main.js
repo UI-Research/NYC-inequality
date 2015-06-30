@@ -255,9 +255,6 @@ function drawGraphic(containerWidth) {
     $(".barContainer").empty();
   });
   dispatch.on("load.menu", function(data) {
-    // dispatch.on("deselectEntities", function(eventType){
-      
-    // });
     (function( $ ) {
       $.widget( "custom.combobox", {
         _create: function() {
@@ -1768,8 +1765,16 @@ function drawGraphic(containerWidth) {
                     .replace('y','')
                     .replace(' ','');
       var newData = d3.select(".clicked").data()[0];
-      var newName = newData.name.replace(/ /g,"?");
-      newData.name = newName
+      var newName;
+      console.log(typeof(newData))
+      if(typeof(newData) != "undefined"){
+        newName = newData.name.replace(/ /g,"?");
+        newData.name = newName
+      }
+      else{
+        newName = ""
+      }
+
       var d = JSON.stringify(newData)
         var url = ("print.html?" + "year=" + yearName + "&type=" + typeName + "&data=" + d)
         url = url.replace(/ /g,'')

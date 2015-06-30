@@ -1757,6 +1757,10 @@ function drawGraphic(containerWidth) {
           },1000);
         },500);
       }
+      else{
+        d3.select(".loading").style("display","none");
+        parent.printPage();
+      }
     },2000);
 
   });
@@ -1767,3 +1771,5 @@ document.addEventListener('mousemove', function(e){
     mouse.y = e.clientY || e.pageY 
 }, false);
 pymChild = new pym.Child({ renderCallback: drawGraphic, polling: 500});
+var referrer = document.referrer;
+d3.select("#citation-url").text(referrer.split("?")[0])
