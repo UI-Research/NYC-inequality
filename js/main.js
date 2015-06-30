@@ -804,9 +804,16 @@ function drawGraphic(containerWidth) {
     dispatch.on("deselectEntities.bars", function(eventType){
       var tooltip = d3.select(".bar.tooltip")
       if(d3.selectAll(".bar.clicked").node() == null){
-        var tooltipY = tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/)[1]
-        tooltip.transition()
-          .attr("transform", "translate(2000," + tooltipY + ")")
+        var trans = tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/)
+        if(trans === null && typeof trans === "object"){
+          tooltip.transition()
+            .attr("transform", "translate(2000,0)")
+        }
+        else{
+          var tooltipY = trans[1]
+          tooltip.transition()
+            .attr("transform", "translate(2000," + tooltipY + ")")
+        }
       }
       else{
         var bar = d3.select(".bar.clicked")
@@ -1558,18 +1565,22 @@ function drawGraphic(containerWidth) {
         }
         svg.selectAll(".scatter.puma.dot")
           .transition()
-          .attr("cy", 600);
+          .duration(1400)
+          .attr("cy", "3600px");
         svg.selectAll(".scatter.puma.connector")
           .transition()
-          .attr("y1", 600)
-          .attr("y2", 600);
+          .duration(1400)
+          .attr("y1", "3600px")
+          .attr("y2", "3600px");
         svg.selectAll(".scatter.borough.dot")
           .transition()
-          .attr("cy", 600);
+          .duration(1400)
+          .attr("cy", "3600px");
         svg.selectAll(".scatter.borough.connector")
           .transition()
-          .attr("y1", 600)
-          .attr("y2", 600);
+          .duration(1400)
+          .attr("y1", "3600px")
+          .attr("y2", "3600px");
       }
       if(d3.select(".clicked").node() ==  null){
         returnDefaults("unbanked")
@@ -1604,13 +1615,13 @@ function drawGraphic(containerWidth) {
         var boroughData = data.get(BOROUGHS[d.borough]);
         svg.selectAll("circle.temp")
           .transition()
-          .duration(800)
-          .attr("cy", 600)
+          .duration(1400)
+          .attr("cy", "3600px")
         svg.selectAll("line.temp")
           .transition()
-          .duration(800)
-          .attr("y1", 600)
-          .attr("y2", 600)
+          .duration(1400)
+          .attr("y1", "3600px")
+          .attr("y2", "3600px")
         svg.select(".scatter.puma.dot.y2011")
           .attr("value", pumaID)
           .transition()
