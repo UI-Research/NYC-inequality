@@ -1561,18 +1561,18 @@ function drawGraphic(containerWidth) {
         }
         svg.selectAll(".scatter.puma.dot")
           .transition()
-          .attr("cy", 600);
+          .attr("cy", "600px");
         svg.selectAll(".scatter.puma.connector")
           .transition()
-          .attr("y1", 600)
-          .attr("y2", 600);
+          .attr("y1", "600px")
+          .attr("y2", "600px");
         svg.selectAll(".scatter.borough.dot")
           .transition()
-          .attr("cy", 600);
+          .attr("cy", "600px");
         svg.selectAll(".scatter.borough.connector")
           .transition()
-          .attr("y1", 600)
-          .attr("y2", 600);
+          .attr("y1", "600px")
+          .attr("y2", "600px");
       }
       if(d3.select(".clicked").node() ==  null){
         returnDefaults("unbanked")
