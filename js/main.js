@@ -807,10 +807,16 @@ function drawGraphic(containerWidth) {
     dispatch.on("deselectEntities.bars", function(eventType){
       var tooltip = d3.select(".bar.tooltip")
       if(d3.selectAll(".bar.clicked").node() == null){
-        console.log(tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/))
-        // var tooltipY = tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/)[1]
-        // tooltip.transition()
-        //   .attr("transform", "translate(2000," + tooltipY + ")")
+        var trans = tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/)
+        if(trans === null && typeof trans === "object"){
+          tooltip.transition()
+            .attr("transform", "translate(2000,0)")
+        }
+        else{
+          var tooltipY = trans[1]
+          tooltip.transition()
+            .attr("transform", "translate(2000," + tooltipY + ")")
+        }
       }
       else{
         var bar = d3.select(".bar.clicked")
