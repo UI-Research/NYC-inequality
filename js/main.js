@@ -807,6 +807,7 @@ function drawGraphic(containerWidth) {
     dispatch.on("deselectEntities.bars", function(eventType){
       var tooltip = d3.select(".bar.tooltip")
       if(d3.selectAll(".bar.clicked").node() == null){
+        console.log(tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/))
         // var tooltipY = tooltip.attr("transform").match(/translate\([\d\.]*,([\d\.]*)/)[1]
         // tooltip.transition()
         //   .attr("transform", "translate(2000," + tooltipY + ")")
