@@ -457,3 +457,8 @@ svg.map{
 .fips_3702{
  stroke-width:0px !important;   
 }
+
+
+@media (max-width: 480px) {
+  	#print-button{ display: none;}
+}
