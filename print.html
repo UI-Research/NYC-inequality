@@ -14,10 +14,13 @@ body{
 <script src="js/vendor/jquery-1.11.2.min.js"></script>
 <script>
 	var scrollFunc = function(){
-	  $('html,body', window.document).animate({
-	    scrollTop: '900px'
-	  }, 200);
+	  // $('html,body', window.document).animate({
+	  //   scrollTop: '900px'
+	  // }, 200);
 	};
+	var printPage = function(){
+		window.print();
+	}
     var parent = new pym.Parent('graphic', 'print_child.html', {});
 </script>
 </body>

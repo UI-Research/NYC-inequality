@@ -4,13 +4,59 @@
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="css/main.css">
 <link rel="stylesheet" href="css/vendor/jquery-ui-1.11.4.css">
+<style>
+body{
+	pointer-events: none !important;
+}
+.legend.key, .legend.more{
+	pointer-events: none !important;
+}
+.legend.definition, .legend.more, .bar.tooltip, .helpText, .ui-widget{
+	display: none;
+}
+.barContainer{
+	width: 100%;
+	position: fixed;
+	float: right;
+}
+.barContainer svg{
+	width: 30% !important;
+	float: right;
+}
+#bottomMenuContainer .title{
+	font-size: 24pt !important;
+}
+@media all {
+	.page-break	{ display: none; }
+}
 
+@media print {
+	.page-break	{ display: block; page-break-before: always; }
+}
+.scatter.row{
+	padding-top: 340px;
+}
+.map.row{
+	padding-top: 80px;
+}
+
+.loading{
+  position: fixed;
+  z-index: 10;
+  opacity: .95;
+}
+.loading img{
+	width: 790px;
+}
+
+</style>
 </head>
 <body>
-<div class = "header row">
+<div class = "header row" style = "display: none">
 	<div class = "data buttons"></div>
 </div>
     <!-- <div class="explainer row">The difference between unbanked and underbanked</div> -->
+<div class = "loading"><img src = "img/loading.gif"></div>
 <div class = "map row">
 <svg class="map" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 700 600" style="enable-background:new 0 0 700 600;" xml:space="preserve"  aria-labelledby="title desc" role="img">
@@ -4288,8 +4334,8 @@
 </svg>
 <div class = "barContainer"></div>
 </div>
-    <button>Print this screen</button>
-<div class = "scatter row"></div>
+<div class = "scatter row">
+</div>
     <div class="footer">
     <p class="suggested-citation"><b>Suggested citation: </b>Lorem ipsum dolor sit amet, accumsan vehicula donec a, praesent nonummy condimentum nunc amet semper, porttitor dictum.</p>
     </div>

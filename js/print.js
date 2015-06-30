@@ -41,7 +41,23 @@ var layout = {"desktop": {
               },
               "mobile": {}
         };
+function getUrlVars()
+{
+    var vars = [], hash;
+    var hashes = document.referrer.slice(document.referrer.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        var val;
+        val = hash[1]
+        vars[hash[0]] = val;
+    }
+    return vars;
+}
+
 function drawGraphic(containerWidth) {
+
   SMALL_DESKTOP = Modernizr.mq('only all and (max-width: ' + BREAK_ONE + 'px)')
   VERY_SMALL_DESKTOP = Modernizr.mq('only all and (max-width: ' + BREAK_TWO + 'px)')
   TABLET = Modernizr.mq('only all and (max-width: ' + BREAK_THREE + 'px)')
@@ -49,9 +65,7 @@ function drawGraphic(containerWidth) {
 
 
 
-  var scrollDown = function(){
-    window.parent.scrollFunc();
-  }
+
 // wrap function modified from http://bl.ocks.org/mbostock/7555321
   var wrap = function(text, width) {
     text.each(function() {
@@ -82,12 +96,13 @@ function drawGraphic(containerWidth) {
     else { return borough;}
   }
   var getTooltipX = function(x, d, width, context, tooltip){
-    if (d3.select("svg.bars").attr("width") > (width - x(d[context]) + 67) + tooltip.node().getBBox().width){
-      return (width - x(d[context]) + 7)
-    }
-    else{
-      return d3.select("svg.bars").attr("width")/2
-    }
+    // if (d3.select("svg.bars").attr("width") > (width - x(d[context]) + 67) + tooltip.node().getBBox().width){
+    //   return (width - x(d[context]) + 7)
+    // }
+    // else{
+    //   return d3.select("svg.bars").attr("width")/2
+    // }
+    return 0;
   }
   var getContext = function(type, year){
     var typeName = d3.select(type)
@@ -745,7 +760,6 @@ function drawGraphic(containerWidth) {
       if(typeof(prevData) == "undefined"){
         dispatch.selectEntity(d);
         
-        if(objID != "combobox") { scrollDown(); }
         clicked.classed("clicked", true)
       }
       else{
@@ -756,7 +770,6 @@ function drawGraphic(containerWidth) {
         }
         else{
           dispatch.selectEntity(d);
-          if(objID != "combobox") { scrollDown(); }
           previous.classed("clicked", false)
           previous.classed("selected", false)
           clicked.classed("clicked", true)
@@ -770,11 +783,11 @@ function drawGraphic(containerWidth) {
       d3.selectAll(".bar").classed("selected",false)
       var selected = d3.select(".bar.fips_" + d.id).classed("selected",true)
       var context = selected.attr("value")
-      tooltip
-        .datum(d)
-        .transition()
-        .duration(200)
-        .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
+      // tooltip
+      //   .datum(d)
+      //   .transition()
+      //   .duration(200)
+      //   .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
       d3.selectAll(".tooltip .name").remove()
       d3.selectAll(".tooltip .background").remove()
       var names = d.name.split("/")
@@ -816,12 +829,12 @@ function drawGraphic(containerWidth) {
       var context = getContext(type, year);
       values = data.values().filter(function(d){ return d.isPuma}).sort(function(a,b){ return a[context] - b[context]}).reverse()
       var unsorted = data.values().filter(function(d){ return d.isPuma})
-      if(d3.selectAll('.bar.tooltip .name').node() && d3.selectAll('.bar.selected').node() != null){
-        d3.selectAll('.bar.tooltip')  
-          .transition()
-          .duration(600)
-          .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
-      }
+      // if(d3.selectAll('.bar.tooltip .name').node() && d3.selectAll('.bar.selected').node() != null){
+      //   d3.selectAll('.bar.tooltip')  
+      //     .transition()
+      //     .duration(600)
+      //     .attr("transform", function(d) { return "translate(" + getTooltipX(x, d, width, context, tooltip) + "," + (y(d.name)+12) +")" })
+      // }
       d3.select(".nycDashedLine")
         .transition()
         .duration(400)
@@ -1042,7 +1055,7 @@ function drawGraphic(containerWidth) {
 
     svg.append("rect")
       .attr("width", 235)
-      .attr("height", 230)
+      .attr("height", 140)
       .attr("x", 7)
       .attr("y", 7)
       .style("fill", "#fff")
@@ -1090,7 +1103,6 @@ function drawGraphic(containerWidth) {
       .attr("x", 155)
       .attr("y", 125)
       .text("Click for more")
-      .on("click", scrollDown)
 
     svg.append("text")
       .attr("class", "legend definition")
@@ -1629,8 +1641,9 @@ function drawGraphic(containerWidth) {
     
   });
   dispatch.on("load.tooltip", function(data){
+    d3.select(".scatter.row").append("div").attr("class","page-break")
     var tooltip = d3.select(".scatter.row")
-      .append("div")
+      tooltip.append("div")
       .attr("class", "scatter tooltip")
       .style("opacity",0)
       .style("width", SCATTER_TOOLTIP_WIDTH + "px")
@@ -1727,6 +1740,26 @@ function drawGraphic(containerWidth) {
         .style("opacity", 1)
     })
   })
+  $( document ).ready( function() {
+    setTimeout(function() {
+      var vars = getUrlVars();
+      var dataString = vars.data.replace(/%22/g,"\"").replace(/\?/g,' ')
+      if (dataString != "undefined"){
+        dispatch.changeContext(d3.select("button." + vars["type"]).node(), d3.select("button.y" + vars.year).node());
+        dispatch.clickEntity({},JSON.parse(dataString));
+        dispatch.changeContext(d3.select("button." + vars["type"]).node(), d3.select("button.y" + vars.year).node());
+        // dispatch.sortBars(d3.select("button." + vars["type"]).node(), d3.select("button.y" + vars.year).node());
+        setTimeout(function(){
+          dispatch.sortBars(d3.select("button." + vars["type"]).node(), d3.select("button.y" + vars.year).node()); 
+          d3.select(".loading").style("display","none")
+          setTimeout(function(){
+            parent.printPage();
+          },1000);
+        },500);
+      }
+    },2000);
+
+  });
 }
 var mouse = {x: 0, y: 0};
 document.addEventListener('mousemove', function(e){ 

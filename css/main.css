@@ -43,6 +43,9 @@ margin-top:5px;
     overflow-x: hidden;
 }
 
+.ui-autocomplete-input{
+	width: 216px;
+}
   .ui-autocomplete {
     max-height: 550px;
     overflow-y: auto;
@@ -397,7 +400,7 @@ svg.map{
 .legend.key{
 	stroke: #ffffff;
 	stroke-width: 2px;
-	pointer-events: visible !important;
+	pointer-events: visible;
 }
 .legend.value{
 	font: 20pt HelveticaNeue-Bold, 'Arial', sans-serif;
@@ -412,7 +415,7 @@ svg.map{
 .legend.more{
 	font: 9pt HelveticaNeue-Italic, 'Arial', sans-serif;
 	font-style: italic;
-	pointer-events: visible !important;
+	pointer-events: visible;
 }
 .legend.definition{
     font:9pt HelveticaNeue-Italic, 'Arial', sans-serif;

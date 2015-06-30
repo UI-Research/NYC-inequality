@@ -1749,6 +1749,33 @@ function drawGraphic(containerWidth) {
         .style("opacity", 1)
     })
   })
+
+  d3.select("#print-button")
+    .on("click", function(){
+      var type = d3.select("button.type.selected").node()
+      var year = d3.select("button.year.selected").node()
+      var typeName = d3.select(type)
+                    .attr('class')
+                    .replace('button','')
+                    .replace('selected','')
+                    .replace('type','')
+                    .replace(' ','');
+      var yearName = d3.select(year)
+                    .attr('class')
+                    .replace('button','')
+                    .replace('selected','')
+                    .replace('year','')
+                    .replace('y','')
+                    .replace(' ','');
+      var newData = d3.select(".clicked").data()[0];
+      var newName = newData.name.replace(/ /g,"?");
+      newData.name = newName
+      var d = JSON.stringify(newData)
+        var url = ("print.html?" + "year=" + yearName + "&type=" + typeName + "&data=" + d)
+        url = url.replace(/ /g,'')
+        window.open(url)
+
+    })
 }
 var mouse = {x: 0, y: 0};
 document.addEventListener('mousemove', function(e){ 
