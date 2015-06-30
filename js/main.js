@@ -1568,18 +1568,22 @@ function drawGraphic(containerWidth) {
         }
         svg.selectAll(".scatter.puma.dot")
           .transition()
-          .attr("cy", "600px");
+          .duration(1400)
+          .attr("cy", "3600px");
         svg.selectAll(".scatter.puma.connector")
           .transition()
-          .attr("y1", "600px")
-          .attr("y2", "600px");
+          .duration(1400)
+          .attr("y1", "3600px")
+          .attr("y2", "3600px");
         svg.selectAll(".scatter.borough.dot")
           .transition()
-          .attr("cy", "600px");
+          .duration(1400)
+          .attr("cy", "3600px");
         svg.selectAll(".scatter.borough.connector")
           .transition()
-          .attr("y1", "600px")
-          .attr("y2", "600px");
+          .duration(1400)
+          .attr("y1", "3600px")
+          .attr("y2", "3600px");
       }
       if(d3.select(".clicked").node() ==  null){
         returnDefaults("unbanked")
@@ -1614,13 +1618,13 @@ function drawGraphic(containerWidth) {
         var boroughData = data.get(BOROUGHS[d.borough]);
         svg.selectAll("circle.temp")
           .transition()
-          .duration(800)
-          .attr("cy", 600)
+          .duration(1400)
+          .attr("cy", "3600px")
         svg.selectAll("line.temp")
           .transition()
-          .duration(800)
-          .attr("y1", 600)
-          .attr("y2", 600)
+          .duration(1400)
+          .attr("y1", "3600px")
+          .attr("y2", "3600px")
         svg.select(".scatter.puma.dot.y2011")
           .attr("value", pumaID)
           .transition()
