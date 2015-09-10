@@ -1,5 +1,5 @@
 body{
-	font: 12pt HelveticaNeue, 'Arial',sans-serif;
+	font: 12pt Lato, 'Arial',sans-serif;
 	min-height: 100%;
 	position: relative;
 	margin: 0;
@@ -90,22 +90,27 @@ button{
     padding-right:15px;
     border: 0;
     font-size: 12pt;
-    font-family: HelveticaNeue, 'Arial',sans-serif;
-    font-weight: 700;
-}
-button:hover{
-    background-color: #ff6d22;
+    font-family: Lato, 'Arial',sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-right: 1px;
     color:#fff;
 }
-button.selected, .puma.selected, .bar.selected{
-	fill: #ff6d22 !important;
-	background: #ff6d22;
+button:hover{
+    background-color: #1696d2;
+    color:#fff;
+}
+button.selected{
+	fill: #1696d2 !important;
+	background: #1696d2;
+}
+.puma.selected, .bar.selected{
+	fill: #fdbf11 !important;
+	background: #fdbf11;
 }
 
 .footer{
  width: 110%;
-    background-color:#000;
-    color:#fff;
     position: relative;
     left: 0;
     right: 0;
@@ -120,21 +125,19 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 .footer-btn{
- background-color: #fff;
-    border: 1px solid #000;
+ background-color: #1696d2;
 }
 .footer-btn:hover{
- background-color: #ff6d22;
-    border: 1px solid #000;
+ background-color: #0a4c6a;
 }
 
 .puma.clicked, .bar.clicked{
-	fill: #ff6d22 !important;
-	background: #ff6d22;
+	fill: #1696d2 !important;
+	background: #1696d2;
 }
 
 .key.selected{
-	stroke: #ff6d22 !important;	
+	stroke: #fdbf11 !important;	
 }
 
 .nycDashedLine{
@@ -145,12 +148,12 @@ button.selected, .puma.selected, .bar.selected{
 	fill: #333333;
 }
 .nycText{
-	font: 10pt HelveticaNeue, 'Arial', sans-serif;
+	font: 10pt Lato, 'Arial', sans-serif;
 }
-.bucket_1{fill:#adcdec;}
-.bucket_2{fill:#00a9e9;}
-.bucket_3{fill:#1268b3;}
-.bucket_4{fill:#013b82;}
+.bucket_1{fill:#cfe8f3;}
+.bucket_2{fill:#73bfe2;}
+.bucket_3{fill:#1696d2;}
+.bucket_4{fill:#0a4c6a;}
 .bucket_5{fill:#002e42;}
 
 .bar.tooltip{
@@ -161,10 +164,10 @@ button.selected, .puma.selected, .bar.selected{
 	opacity: .8
 }
 .bar.tooltip .value{
-	font: 14pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 14pt Lato-Bold, 'Arial', sans-serif;
 }
 .bar.tooltip .name{
-	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 12pt Lato-Bold, 'Arial', sans-serif;
 }
 .parks{
  pointer-events: none;
@@ -178,7 +181,7 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 #bottomMenuContainer .title{
-	font: 24pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 24pt Lato-Bold, 'Arial', sans-serif;
     margin-bottom: 1px;
 }
 
@@ -219,7 +222,7 @@ button.selected, .puma.selected, .bar.selected{
 
 
 .data.buttons .title{
-	font: 24pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 24pt Lato-Bold, 'Arial', sans-serif;
     margin-bottom: 10px;
 }
 
@@ -265,11 +268,11 @@ button.selected, .puma.selected, .bar.selected{
 }
 
 .scatter.title{
-	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 12pt Lato-Bold, 'Arial', sans-serif;
 }
 
 .scatter.axis text{
-	font: 10pt HelveticaNeue, 'Arial', sans-serif;
+	font: 10pt Lato, 'Arial', sans-serif;
 }
 
 .scatter.axis.y path{
@@ -301,10 +304,10 @@ button.selected, .puma.selected, .bar.selected{
 }
 .scatter.text{
 	stroke: none !important;
-	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 12pt Lato-Bold, 'Arial', sans-serif;
 }
 .scatter.puma{
-	stroke: #ff6d22;
+	stroke: #1696d2;
 }
 .scatter.temp{
 	stroke: #cccccc;
@@ -357,7 +360,7 @@ button.selected, .puma.selected, .bar.selected{
 	display: inline-block;
 }
 .tooltip.text.emphasis{
-	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 12pt Lato-Bold, 'Arial', sans-serif;
 }
 
 .turtleWarning{
@@ -379,7 +382,7 @@ svg.map{
 
 .map.borough.name{
 	fill: #ffffff;
-	font: 10pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 10pt Lato-Bold, 'Arial', sans-serif;
 	letter-spacing: 2pt;
 }
 .shadow{
@@ -387,15 +390,15 @@ svg.map{
 }
 .map.state.name{
 	fill: #cccccc;
-	font: 10pt HelveticaNeue, 'Arial', sans-serif;
+	font: 10pt Lato, 'Arial', sans-serif;
 	letter-spacing: 3pt;
 }
 /************* MAP LEGEND STYLES ********************/
 .legend.title{
-	font: 12pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 12pt Lato-Bold, 'Arial', sans-serif;
 }
 .legend.label{
-	font: 9pt HelveticaNeue, 'Arial', sans-serif;
+	font: 9pt Lato, 'Arial', sans-serif;
 }
 .legend.key{
 	stroke: #ffffff;
@@ -403,22 +406,22 @@ svg.map{
 	pointer-events: visible;
 }
 .legend.value{
-	font: 20pt HelveticaNeue-Bold, 'Arial', sans-serif;
+	font: 20pt Lato-Bold, 'Arial', sans-serif;
 	stroke: none;
 }
 .legend.nyc.value{
 	fill: #000000;
 }
 .legend.puma.value{
-	fill: #ff6d22;
+	fill: #1696d2;
 }
 .legend.more{
-	font: 9pt HelveticaNeue-Italic, 'Arial', sans-serif;
+	font: 9pt Lato-Italic, 'Arial', sans-serif;
 	font-style: italic;
 	pointer-events: visible;
 }
 .legend.definition{
-    font:9pt HelveticaNeue-Italic, 'Arial', sans-serif;
+    font:9pt Lato-Italic, 'Arial', sans-serif;
     width: 150px;
 }
 /************* STYLES FROM ILLUSTRATOR ********************/
@@ -441,15 +444,15 @@ svg.map{
 .st4{fill:#FFFFFF;}
 .st5{fill:#002E41;stroke:#FFFFFF;stroke-width:0.26;stroke-linecap:square;stroke-linejoin:bevel;}
 
-.st6{font-family:'HelveticaNeue-Italic', 'Arial', sans-serif;}
+.st6{font-family:'Lato-Italic', 'Arial', sans-serif;}
 .st7{font-size:12;}
 .st8{fill:#F26E28;}
-.st9{font-family:'HelveticaNeue-Bold', 'Arial', sans-serif;}
+.st9{font-family:'Lato-Bold', 'Arial', sans-serif;}
 .st10{font-size:36;}
 .st11{fill:none;}
 .st12{font-size:18;}
 .st13{fill:none;stroke:#F26E28;stroke-width:2;stroke-miterlimit:10;}
-.st14{font-family:'HelveticaNeue';}
+.st14{font-family:'Lato';}
 .st15{fill:#CCCBCB;}
 .st16{letter-spacing:4;}
 .st17{letter-spacing:2;}
