@@ -391,7 +391,7 @@ svg.map{
 .map.state.name{
 	fill: #cccccc;
 	font: 10pt Lato, 'Arial', sans-serif;
-	letter-spacing: 3pt;
+	letter-spacing: 2pt;
 }
 /************* MAP LEGEND STYLES ********************/
 .legend.title{
