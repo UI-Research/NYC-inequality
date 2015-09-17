@@ -133,8 +133,8 @@ button.selected{
 }
 
 .puma.clicked, .bar.clicked{
-	fill: #1696d2 !important;
-	background: #1696d2;
+	fill: #fdbf11 !important;
+	background: #fdbf11;
 }
 
 .key.selected{

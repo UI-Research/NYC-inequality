@@ -47,6 +47,7 @@ function drawGraphic(containerWidth) {
   TABLET = Modernizr.mq('only all and (max-width: ' + BREAK_THREE + 'px)')
   PHONE = Modernizr.mq('only all and (max-width: ' + BREAK_FOUR + 'px)')
 
+
 // wrap function modified from http://bl.ocks.org/mbostock/7555321
   var wrap = function(text, width) {
     text.each(function() {
