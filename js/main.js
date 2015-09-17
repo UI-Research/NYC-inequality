@@ -47,11 +47,6 @@ function drawGraphic(containerWidth) {
   TABLET = Modernizr.mq('only all and (max-width: ' + BREAK_THREE + 'px)')
   PHONE = Modernizr.mq('only all and (max-width: ' + BREAK_FOUR + 'px)')
 
-
-
-  var scrollDown = function(){
-    window.parent.scrollFunc();
-  }
 // wrap function modified from http://bl.ocks.org/mbostock/7555321
   var wrap = function(text, width) {
     text.each(function() {
@@ -751,7 +746,6 @@ function drawGraphic(containerWidth) {
       if(typeof(prevData) == "undefined"){
         dispatch.selectEntity(d);
         
-        if(objID != "combobox") { scrollDown(); }
         clicked.classed("clicked", true)
       }
       else{
@@ -762,7 +756,6 @@ function drawGraphic(containerWidth) {
         }
         else{
           dispatch.selectEntity(d);
-          if(objID != "combobox") { scrollDown(); }
           previous.classed("clicked", false)
           previous.classed("selected", false)
           clicked.classed("clicked", true)
@@ -1103,7 +1096,6 @@ function drawGraphic(containerWidth) {
       .attr("x", 155)
       .attr("y", 125)
       .text("Click for more")
-      .on("click", scrollDown)
 
     svg.append("text")
       .attr("class", "legend definition")
