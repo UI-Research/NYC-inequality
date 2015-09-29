@@ -96,6 +96,7 @@ button{
     text-transform: uppercase;
     margin-right: 1px;
     color:#fff;
+    cursor: pointer;
 }
 button:hover{
     background-color: #1696d2;
